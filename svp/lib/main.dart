@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'second_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -38,7 +39,7 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
- void _login() async {
+  void _login() async {
     if (!_loading) {
       setState(() {
         _loading = true;
@@ -50,7 +51,7 @@ class _HomePageState extends State<HomePage> {
 
       if (email.isNotEmpty && password.isNotEmpty) {
         Map<String, dynamic> data = {
-          'username': email,
+          'email': email,
           'password': password,
         };
 
@@ -70,7 +71,8 @@ class _HomePageState extends State<HomePage> {
             Map<String, dynamic> responseData = jsonDecode(response.body);
             print('Response body: $responseData');
             print('Login successful!');
-            // Navigate to the second page on successful login
+
+            // Navigate to the SecondPage
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => SecondPage()),
@@ -108,7 +110,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,9 +129,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Stack(
                     children: <Widget>[
-                      Positioned(
-                        left: 130,
-                        top: 60,
+                    Center(
                         child: Container(
                           width: 120,
                           height: 200,
@@ -143,7 +142,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Positioned(
                         child: Container(
-                          margin: EdgeInsets.only(top: 120),
+                          margin: EdgeInsets.only(top: 170),
                           child: Center(
                             child: Text(
                               "Login",
@@ -269,31 +268,13 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
-                    Text(
-                      "Forgot Password?",
-                      style: TextStyle(
-                        color: Color.fromRGBO(143, 148, 251, 1),
-                      ),
-                    ),
+                    
                   ],
                 ),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class SecondPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      
-      body: Center(
-        child: Text("welcome you have logged in"),
       ),
     );
   }

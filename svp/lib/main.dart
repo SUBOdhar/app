@@ -195,6 +195,7 @@ class _HomePageState extends State<HomePage> {
                               onSubmitted: (_) => FocusScope.of(context)
                                   .requestFocus(_passwordFocusNode),
                               decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.mail),
                                 border: InputBorder.none,
                                 hintText: "Email",
                                 hintStyle: TextStyle(color: Colors.grey[700]),

@@ -34,6 +34,7 @@ class _HomePageState extends State<HomePage> {
       FocusNode(); // FocusNode for password field
   bool _loading = false;
   Color _buttonColor = const Color.fromRGBO(143, 148, 251, 1);
+  bool _obscureText = true;
 
   @override
   void dispose() {
@@ -133,7 +134,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Stack(
                     children: <Widget>[
-                    Center(
+                      Center(
                         child: Container(
                           width: 120,
                           height: 200,
@@ -194,6 +195,9 @@ class _HomePageState extends State<HomePage> {
                               controller: _emailController,
                               onSubmitted: (_) => FocusScope.of(context)
                                   .requestFocus(_passwordFocusNode),
+                              style: TextStyle(
+                                color: Colors.black,
+                              ),
                               decoration: InputDecoration(
                                 prefixIcon: const Icon(Icons.mail),
                                 border: InputBorder.none,
@@ -232,11 +236,25 @@ class _HomePageState extends State<HomePage> {
                             child: TextField(
                               controller: _passwordController,
                               focusNode: _passwordFocusNode,
-                              obscureText: true,
+                              obscureText: _obscureText,
+                              style: TextStyle(
+                                color: Colors.black,
+                              ),
                               decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.lock),
                                 border: InputBorder.none,
                                 hintText: "Password",
                                 hintStyle: TextStyle(color: Colors.grey[700]),
+                                suffixIcon: IconButton(
+                                  icon: Icon(_obscureText
+                                      ? Icons.visibility
+                                      : Icons.visibility_off),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureText = !_obscureText;
+                                    });
+                                  },
+                                ),
                               ),
                             ),
                           ),
@@ -273,7 +291,6 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    
                   ],
                 ),
               ),

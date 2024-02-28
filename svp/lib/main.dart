@@ -3,9 +3,11 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'second_page.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -13,12 +15,14 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       darkTheme: ThemeData.dark(),
       theme: ThemeData.light(),
-      home: HomePage(),
+      home: const HomePage(),
     );
   }
 }
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -29,7 +33,7 @@ class _HomePageState extends State<HomePage> {
   final FocusNode _passwordFocusNode =
       FocusNode(); // FocusNode for password field
   bool _loading = false;
-  Color _buttonColor = Color.fromRGBO(143, 148, 251, 1);
+  Color _buttonColor = const Color.fromRGBO(143, 148, 251, 1);
 
   @override
   void dispose() {
@@ -75,13 +79,13 @@ class _HomePageState extends State<HomePage> {
             // Navigate to the SecondPage
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SecondPage()),
+              MaterialPageRoute(builder: (context) => const SecondPage()),
             );
           } else {
             // Login failed
             print('Error: ${response.statusCode}');
             // Show an error message to the user
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text('Login failed. Please try again.'),
               backgroundColor: Colors.red,
             ));
@@ -90,7 +94,7 @@ class _HomePageState extends State<HomePage> {
           // Error occurred during login request
           print('Error: $error');
           // Show an error message to the user
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('An error occurred. Please try again later.'),
             backgroundColor: Colors.red,
           ));
@@ -98,11 +102,11 @@ class _HomePageState extends State<HomePage> {
 
         setState(() {
           _loading = false;
-          _buttonColor = Color.fromRGBO(143, 148, 251, 1);
+          _buttonColor = const Color.fromRGBO(143, 148, 251, 1);
         });
       } else {
         // Email or password is empty
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Please enter email and password.'),
           backgroundColor: Colors.red,
         ));
@@ -121,7 +125,7 @@ class _HomePageState extends State<HomePage> {
               Center(
                 child: Container(
                   height: 400,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage('assets/images/background.png'),
                       fit: BoxFit.fill,
@@ -133,7 +137,7 @@ class _HomePageState extends State<HomePage> {
                         child: Container(
                           width: 120,
                           height: 200,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             image: DecorationImage(
                               image: AssetImage('assets/images/clock.png'),
                             ),
@@ -142,8 +146,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Positioned(
                         child: Container(
-                          margin: EdgeInsets.only(top: 170),
-                          child: Center(
+                          margin: const EdgeInsets.only(top: 170),
+                          child: const Center(
                             child: Text(
                               "Login",
                               style: TextStyle(
@@ -160,18 +164,18 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(20.0),
+                padding: const EdgeInsets.all(20.0),
                 child: Column(
                   children: <Widget>[
                     Container(
-                      padding: EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: Color.fromRGBO(143, 148, 251, 1),
+                          color: const Color.fromRGBO(143, 148, 251, 1),
                         ),
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(
                             color: Color.fromRGBO(143, 148, 251, .2),
                             blurRadius: 20.0,
@@ -182,8 +186,8 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         children: <Widget>[
                           Container(
-                            padding: EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: const BoxDecoration(
                               border: Border(),
                             ),
                             child: TextField(
@@ -200,16 +204,16 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Container(
-                      padding: EdgeInsets.all(5),
+                      padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: Color.fromRGBO(143, 148, 251, 1),
+                          color: const Color.fromRGBO(143, 148, 251, 1),
                         ),
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(
                             color: Color.fromRGBO(143, 148, 251, .2),
                             blurRadius: 20.0,
@@ -220,8 +224,8 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         children: <Widget>[
                           Container(
-                            padding: EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: const BoxDecoration(
                               border: Border(),
                             ),
                             child: TextField(
@@ -238,7 +242,7 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     GestureDetector(
                       onTap: _login,
                       child: Container(
@@ -248,17 +252,17 @@ class _HomePageState extends State<HomePage> {
                           gradient: LinearGradient(
                             colors: [
                               _buttonColor,
-                              Color.fromRGBO(143, 148, 251, .6),
+                              const Color.fromRGBO(143, 148, 251, .6),
                             ],
                           ),
                         ),
                         child: Center(
                           child: _loading
-                              ? CircularProgressIndicator(
+                              ? const CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(
                                       Colors.white),
                                 )
-                              : Text(
+                              : const Text(
                                   "Login",
                                   style: TextStyle(
                                     color: Colors.white,

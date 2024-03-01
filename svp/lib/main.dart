@@ -11,7 +11,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
       darkTheme: ThemeData.dark(),
       theme: ThemeData.light(),
@@ -195,7 +194,7 @@ class _HomePageState extends State<HomePage> {
                               controller: _emailController,
                               onSubmitted: (_) => FocusScope.of(context)
                                   .requestFocus(_passwordFocusNode),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.black,
                               ),
                               decoration: InputDecoration(
@@ -237,7 +236,7 @@ class _HomePageState extends State<HomePage> {
                               controller: _passwordController,
                               focusNode: _passwordFocusNode,
                               obscureText: _obscureText,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.black,
                               ),
                               decoration: InputDecoration(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'second_page.dart';
+import 'home.dart';
 
 void main() => runApp(const MyApp());
 
@@ -285,7 +285,7 @@ class _HomePageState extends State<HomePage> {
       Map<String, dynamic> data = {
         'email': email,
         'password': password,
-        'app':'svp_admin',
+        'app': 'svp_admin',
       };
 
       String jsonData = jsonEncode(data);
@@ -314,7 +314,7 @@ class _HomePageState extends State<HomePage> {
           // Navigate to the SecondPage
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const SecondPage()),
+            MaterialPageRoute(builder: (context) => const VeterinaryDashboard()),
           );
         } else {
           // Login failed

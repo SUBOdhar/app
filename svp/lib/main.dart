@@ -285,6 +285,7 @@ class _HomePageState extends State<HomePage> {
       Map<String, dynamic> data = {
         'email': email,
         'password': password,
+        'app':'svp_admin',
       };
 
       String jsonData = jsonEncode(data);

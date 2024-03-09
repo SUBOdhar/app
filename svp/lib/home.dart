@@ -13,6 +13,7 @@ class VeterinaryDashboard extends StatelessWidget {
             margin: const EdgeInsets.all(10.0),
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
+              
             ),
             child: const CircleAvatar(
               backgroundImage: AssetImage(

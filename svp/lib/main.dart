@@ -38,9 +38,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    if (_emailController.text.isEmpty && _passwordController.text.isEmpty) {
-      _login();
-    }
+
+    _login();
   }
 
   @override
@@ -259,8 +258,10 @@ class _HomePageState extends State<HomePage> {
       DateTime now = DateTime.now();
       final difference = now.difference(storedDateTime).inDays;
       if (difference <= 13) {
-        _emailController.text = storedEmail;
-        _passwordController.text = storedPassword;
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Home(username: storedEmail)),
+        );
       } else {
         prefs.remove('email');
         prefs.remove('password');
@@ -280,7 +281,7 @@ class _HomePageState extends State<HomePage> {
 
     try {
       http.Response response = await http.post(
-        Uri.parse('http://192.168.101.5:5000/login'),
+        Uri.parse('http://192.168.101.2:5000/login'),
         headers: <String, String>{
           'Content-Type': 'application/json',
         },

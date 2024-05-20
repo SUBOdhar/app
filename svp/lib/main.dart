@@ -310,11 +310,11 @@ class _HomePageState extends State<HomePage> {
           prefs.setString('email', email);
           prefs.setString('password', password);
           prefs.setInt('timestamp', DateTime.now().millisecondsSinceEpoch);
-
+          Navigator.of(context, rootNavigator: true).pop();
           // Navigate to the SecondPage
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const VeterinaryDashboard()),
+            MaterialPageRoute(builder: (context) => const Home()),
           );
         } else {
           // Login failed

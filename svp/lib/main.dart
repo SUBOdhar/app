@@ -28,20 +28,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  @override
-  void initState() {
-    super.initState();
-    // Call _login function when the page is initialized
-    _login();
-  }
-
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final FocusNode _passwordFocusNode =
-      FocusNode(); // FocusNode for password field
+  final FocusNode _passwordFocusNode = FocusNode();
   bool _loading = false;
   Color _buttonColor = const Color.fromRGBO(143, 148, 251, 1);
   bool _obscureText = true;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_emailController.text.isEmpty && _passwordController.text.isEmpty) {
+      _login();
+    }
+  }
 
   @override
   void dispose() {
@@ -56,289 +56,282 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
-        child: Container(
-          child: Column(
-            children: <Widget>[
-              Center(
-                child: Container(
-                  height: 400,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/background.png'),
-                      fit: BoxFit.fill,
+        child: Column(
+          children: <Widget>[
+            _buildHeader(),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: <Widget>[
+                  _buildTextField(_emailController, "Email", Icons.mail, false),
+                  const SizedBox(height: 20),
+                  _buildTextField(
+                      _passwordController, "Password", Icons.lock, true),
+                  const SizedBox(height: 30),
+                  _buildLoginButton(),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Center(
+      child: Container(
+        height: 400,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/images/background.png'),
+            fit: BoxFit.fill,
+          ),
+        ),
+        child: Stack(
+          children: <Widget>[
+            Center(
+              child: Container(
+                width: 120,
+                height: 200,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/clock.png'),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              child: Container(
+                margin: const EdgeInsets.only(top: 170),
+                child: const Center(
+                  child: Text(
+                    "Login",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: Container(
-                          width: 120,
-                          height: 200,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/images/clock.png'),
-                            ),
-                          ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String hintText,
+      IconData icon, bool isPassword) {
+    return Container(
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color.fromRGBO(143, 148, 251, 1),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color.fromRGBO(143, 148, 251, .2),
+            blurRadius: 20.0,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        children: <Widget>[
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: controller,
+              focusNode: isPassword ? _passwordFocusNode : null,
+              obscureText: isPassword && _obscureText,
+              autofillHints: isPassword
+                  ? const [AutofillHints.password]
+                  : const [AutofillHints.email],
+              style: const TextStyle(color: Colors.black),
+              decoration: InputDecoration(
+                prefixIcon: Icon(icon),
+                border: InputBorder.none,
+                hintText: hintText,
+                hintStyle: TextStyle(color: Colors.grey[700]),
+                suffixIcon: isPassword
+                    ? IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility
+                              : Icons.visibility_off,
                         ),
-                      ),
-                      Positioned(
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 170),
-                          child: const Center(
-                            child: Text(
-                              "Login",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
                       )
-                    ],
-                  ),
-                ),
+                    : null,
               ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: const Color.fromRGBO(143, 148, 251, 1),
-                        ),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color.fromRGBO(143, 148, 251, .2),
-                            blurRadius: 20.0,
-                            offset: Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            padding: const EdgeInsets.all(8.0),
-                            decoration: const BoxDecoration(
-                              border: Border(),
-                            ),
-                            child: TextField(
-                              controller: _emailController,
-                              autofillHints: const [AutofillHints.email],
-                              onSubmitted: (_) => FocusScope.of(context)
-                                  .requestFocus(_passwordFocusNode),
-                              style: const TextStyle(
-                                color: Colors.black,
-                              ),
-                              decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.mail),
-                                border: InputBorder.none,
-                                hintText: "Email",
-                                hintStyle: TextStyle(color: Colors.grey[700]),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: const Color.fromRGBO(143, 148, 251, 1),
-                        ),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color.fromRGBO(143, 148, 251, .2),
-                            blurRadius: 20.0,
-                            offset: Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            padding: const EdgeInsets.all(8.0),
-                            decoration: const BoxDecoration(
-                              border: Border(),
-                            ),
-                            child: TextField(
-                              controller: _passwordController,
-                              autofillHints: const [AutofillHints.password],
-                              focusNode: _passwordFocusNode,
-                              obscureText: _obscureText,
-                              style: const TextStyle(
-                                color: Colors.black,
-                              ),
-                              decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.lock),
-                                border: InputBorder.none,
-                                hintText: "Password",
-                                hintStyle: TextStyle(color: Colors.grey[700]),
-                                suffixIcon: IconButton(
-                                  icon: Icon(_obscureText
-                                      ? Icons.visibility
-                                      : Icons.visibility_off),
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscureText = !_obscureText;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    GestureDetector(
-                      onTap: _login,
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: LinearGradient(
-                            colors: [
-                              _buttonColor,
-                              const Color.fromRGBO(143, 148, 251, .6),
-                            ],
-                          ),
-                        ),
-                        child: Center(
-                          child: _loading
-                              ? const CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white),
-                                )
-                              : const Text(
-                                  "Login",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              onSubmitted: isPassword
+                  ? null
+                  : (_) =>
+                      FocusScope.of(context).requestFocus(_passwordFocusNode),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoginButton() {
+    return GestureDetector(
+      onTap: _login,
+      child: Container(
+        height: 50,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            colors: [
+              _buttonColor,
+              const Color.fromRGBO(143, 148, 251, .6),
             ],
           ),
+        ),
+        child: Center(
+          child: _loading
+              ? const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                )
+              : const Text(
+                  "Login",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ),
       ),
     );
   }
 
   void _login() async {
-    if (!_loading) {
-      setState(() {
-        _loading = true;
-        _buttonColor = Colors.grey;
-      });
+    if (_loading) return;
 
-      String email = _emailController.text;
-      String password = _passwordController.text;
+    setState(() {
+      _loading = true;
+      _buttonColor = Colors.grey;
+    });
 
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      await _useStoredCredentials();
       if (email.isEmpty || password.isEmpty) {
-        // Check if stored credentials exist
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        String storedEmail = prefs.getString('email') ?? '';
-        String storedPassword = prefs.getString('password') ?? '';
-        int storedTimestamp = prefs.getInt('timestamp') ?? 0;
-
-        if (storedEmail.isNotEmpty && storedPassword.isNotEmpty) {
-          // Check if stored credentials are expired
-          DateTime storedDateTime =
-              DateTime.fromMillisecondsSinceEpoch(storedTimestamp);
-          DateTime now = DateTime.now();
-          final difference = now.difference(storedDateTime).inDays;
-          if (difference <= 13) {
-            // Use stored credentials if not expired
-            email = storedEmail;
-            password = storedPassword;
-          } else {
-            // Remove expired credentials
-            prefs.remove('email');
-            prefs.remove('password');
-            prefs.remove('timestamp');
-          }
-        } else {
-          // If no stored credentials, return without displaying an error
-          setState(() {
-            _loading = false;
-            _buttonColor = const Color.fromRGBO(143, 148, 251, 1);
-          });
-          return;
-        }
+        _showSnackBar('Please enter both email and password.');
+        _resetLoadingState();
+        return;
       }
-
-      Map<String, dynamic> data = {
-        'email': email,
-        'password': password,
-        'app': 'svp_admin',
-      };
-
-      String jsonData = jsonEncode(data);
-
-      try {
-        http.Response response = await http.post(
-          Uri.parse('https://api.svp.com.np/login'),
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-          },
-          body: jsonData,
-        );
-
-        if (response.statusCode == 200) {
-          // Login successful
-          Map<String, dynamic> responseData = jsonDecode(response.body);
-          print('Response body: $responseData');
-          print('Login successful!');
-
-          // Save email, password, and timestamp
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setString('email', email);
-          prefs.setString('password', password);
-          prefs.setInt('timestamp', DateTime.now().millisecondsSinceEpoch);
-          Navigator.of(context, rootNavigator: true).pop();
-          // Navigate to the SecondPage
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const Home()),
-          );
-        } else {
-          // Login failed
-          print('Error: ${response.statusCode}');
-          // Show an error message to the user
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Login failed. Please try again.'),
-            backgroundColor: Colors.red,
-          ));
-        }
-      } catch (error) {
-        // Error occurred during login request
-        print('Error: $error');
-        // Show an error message to the user
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('An error occurred. Please try again later.'),
-          backgroundColor: Colors.red,
-        ));
-      }
-
-      setState(() {
-        _loading = false;
-        _buttonColor = const Color.fromRGBO(143, 148, 251, 1);
-      });
     }
+
+    final success = await _performLogin(email, password);
+    if (success) {
+      _saveCredentials(email, password);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Home(username: email)),
+      );
+    } else {
+      _showSnackBar('Login failed. Please try again.');
+    }
+    _resetLoadingState();
+  }
+
+  Future<void> _useStoredCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String storedEmail = prefs.getString('email') ?? '';
+    String storedPassword = prefs.getString('password') ?? '';
+    int storedTimestamp = prefs.getInt('timestamp') ?? 0;
+
+    if (storedEmail.isNotEmpty && storedPassword.isNotEmpty) {
+      DateTime storedDateTime =
+          DateTime.fromMillisecondsSinceEpoch(storedTimestamp);
+      DateTime now = DateTime.now();
+      final difference = now.difference(storedDateTime).inDays;
+      if (difference <= 13) {
+        _emailController.text = storedEmail;
+        _passwordController.text = storedPassword;
+      } else {
+        prefs.remove('email');
+        prefs.remove('password');
+        prefs.remove('timestamp');
+      }
+    }
+  }
+
+  Future<bool> _performLogin(String email, String password) async {
+    Map<String, dynamic> data = {
+      'email': email,
+      'password': password,
+      'app': 'svp_admin',
+    };
+
+    String jsonData = jsonEncode(data);
+
+    try {
+      http.Response response = await http.post(
+        Uri.parse('http://192.168.101.5:5000/login'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonData,
+      );
+
+      if (response.statusCode == 200) {
+        print('Response body: ${response.body}');
+        print('Login successful!');
+        return true;
+      } else if (response.statusCode == 401) {
+        await _clearStoredCredentials();
+        _showSnackBar('Invalid credentials. Please try again.');
+        print('Error: 401 Unauthorized');
+        return false;
+      } else {
+        print('Error: ${response.statusCode}');
+        return false;
+      }
+    } catch (error) {
+      print('Error: $error');
+      _showSnackBar('An error occurred. Please try again later.');
+      return false;
+    }
+  }
+
+  Future<void> _clearStoredCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('email');
+    prefs.remove('password');
+    prefs.remove('timestamp');
+  }
+
+  Future<void> _saveCredentials(String email, String password) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('email', email);
+    prefs.setString('password', password);
+    prefs.setInt('timestamp', DateTime.now().millisecondsSinceEpoch);
+  }
+
+  void _resetLoadingState() {
+    setState(() {
+      _loading = false;
+      _buttonColor = const Color.fromRGBO(143, 148, 251, 1);
+    });
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.red,
+    ));
   }
 }

@@ -4,7 +4,9 @@ import 'package:svp/Check.dart';
 import 'package:svp/Dealer.dart';
 import 'package:svp/add_product.dart';
 import 'package:svp/buy.dart';
-import 'package:svp/main.dart';
+import 'package:svp/main.dart' as MainApp;
+
+import 'package:svp/report.dart';
 import 'package:svp/sell.dart'; // Ensure this file is present
 
 class Home extends StatelessWidget {
@@ -89,7 +91,7 @@ class _PageState extends State<Page> {
               prefs.remove('timestamp');
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const MyApp()),
+                MaterialPageRoute(builder: (context) => const MainApp.MyApp()),
               );
             }),
           ],
@@ -149,10 +151,17 @@ class _PageState extends State<Page> {
                   context,
                   [
                     _buildButtonData(
-                        'Check Products', Icons.inventory, Colors.teal, () {
+                        'Check Stock', Icons.inventory, Colors.teal, () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const Check()),
+                      );
+                    }),
+                    _buildButtonData('Report', Icons.description, Colors.red,
+                        () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Report()),
                       );
                     }),
                   ],

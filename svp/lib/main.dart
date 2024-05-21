@@ -38,7 +38,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
     _login();
   }
 
@@ -60,15 +59,18 @@ class _HomePageState extends State<HomePage> {
             _buildHeader(),
             Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Column(
-                children: <Widget>[
-                  _buildTextField(_emailController, "Email", Icons.mail, false),
-                  const SizedBox(height: 20),
-                  _buildTextField(
-                      _passwordController, "Password", Icons.lock, true),
-                  const SizedBox(height: 30),
-                  _buildLoginButton(),
-                ],
+              child: AutofillGroup(
+                child: Column(
+                  children: <Widget>[
+                    _buildTextField(
+                        _emailController, "Email", Icons.mail, false),
+                    const SizedBox(height: 20),
+                    _buildTextField(
+                        _passwordController, "Password", Icons.lock, true),
+                    const SizedBox(height: 30),
+                    _buildLoginButton(),
+                  ],
+                ),
               ),
             ),
           ],
@@ -147,9 +149,8 @@ class _HomePageState extends State<HomePage> {
               controller: controller,
               focusNode: isPassword ? _passwordFocusNode : null,
               obscureText: isPassword && _obscureText,
-              autofillHints: isPassword
-                  ? const [AutofillHints.password]
-                  : const [AutofillHints.email],
+              autofillHints:
+                  isPassword ? [AutofillHints.password] : [AutofillHints.email],
               style: const TextStyle(color: Colors.black),
               decoration: InputDecoration(
                 prefixIcon: Icon(icon),
@@ -262,6 +263,10 @@ class _HomePageState extends State<HomePage> {
           context,
           MaterialPageRoute(builder: (context) => Home(username: storedEmail)),
         );
+        setState(() {
+          _loading = false;
+          _buttonColor = const Color.fromRGBO(143, 148, 251, 1);
+        });
       } else {
         prefs.remove('email');
         prefs.remove('password');
@@ -281,7 +286,7 @@ class _HomePageState extends State<HomePage> {
 
     try {
       http.Response response = await http.post(
-        Uri.parse('http://192.168.101.2:5000/login'),
+        Uri.parse('http://192.168.101.3:5000/login'),
         headers: <String, String>{
           'Content-Type': 'application/json',
         },

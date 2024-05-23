@@ -28,6 +28,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final mainurl = "http://192.168.0.101:5000";
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _passwordFocusNode = FocusNode();
@@ -286,7 +287,7 @@ class _HomePageState extends State<HomePage> {
 
     try {
       http.Response response = await http.post(
-        Uri.parse('http://192.168.101.3:5000/login'),
+        Uri.parse('$mainurl/login'),
         headers: <String, String>{
           'Content-Type': 'application/json',
         },

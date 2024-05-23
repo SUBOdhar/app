@@ -3,24 +3,27 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key, Key? key1});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Inventory Management',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: Add(),
+      home: const Add(),
     );
   }
 }
 
 class Add extends StatefulWidget {
-  const Add({Key? key}) : super(key: key);
+  const Add({super.key, Key? key2});
 
   @override
   State<Add> createState() => _AddState();
@@ -39,6 +42,8 @@ class _AddState extends State<Add> {
   String? _resultMessage;
   IconData? _resultIcon;
 
+  final mainUrl = "http://192.168.0.101:5000";
+
   @override
   void initState() {
     super.initState();
@@ -54,7 +59,7 @@ class _AddState extends State<Add> {
   }
 
   Future<void> _fetchDealerNames() async {
-    final url = Uri.parse('http://192.168.101.3:5000/dealers');
+    final url = Uri.parse('$mainUrl/dealers');
     try {
       final response = await http.get(url);
 
@@ -62,7 +67,7 @@ class _AddState extends State<Add> {
         final List<dynamic> data = jsonDecode(response.body);
         setState(() {
           if (data.isNotEmpty && data.first is String) {
-            _dealerNames = [data.first as String];
+            _dealerNames = List<String>.from(data);
           } else {
             throw Exception('Invalid response format');
           }
@@ -71,8 +76,30 @@ class _AddState extends State<Add> {
         throw Exception('Failed to fetch dealers: ${response.statusCode}');
       }
     } catch (e) {
-      _showErrorSnackbar('Failed to fetch dealer names');
+      _showErrorDialog('Failed to fetch dealer names');
     }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+          backgroundColor: Colors.red[100],
+        );
+      },
+    );
   }
 
   Future<void> _selectDate(BuildContext context, bool isManufactureDate) async {
@@ -93,7 +120,7 @@ class _AddState extends State<Add> {
     }
   }
 
-  Future<void> _submitForm() async {
+  void _submitForm() {
     if (_formKey.currentState!.validate() &&
         _manufactureDate != null &&
         _expiryDate != null &&
@@ -101,91 +128,106 @@ class _AddState extends State<Add> {
       setState(() {
         _isLoading = true;
       });
-      final String item = _itemController.text;
-      final int quantity = int.parse(_quantityController.text);
-      final String batchNo = _batchNoController.text;
-      final String manufactureDate = _manufactureDate!.toIso8601String();
-      final String expiryDate = _expiryDate!.toIso8601String();
-
-      final url = Uri.parse('http://192.168.101.3:5000/add-item');
-      try {
-        final response = await http.post(
-          url,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: jsonEncode({
-            'item': item,
-            'quantity': quantity,
-            'batchNo': batchNo,
-            'manufactureDate': manufactureDate,
-            'expiryDate': expiryDate,
-            'dealerName': _selectedDealer,
-          }),
-        );
-
-        if (response.statusCode == 200) {
-          setState(() {
-            _resultMessage = 'Item added successfully';
-            _resultIcon = Icons.check;
-            _isLoading = false;
-          });
-          _itemController.clear();
-          _quantityController.clear();
-          _batchNoController.clear();
-          setState(() {
-            _manufactureDate = null;
-            _expiryDate = null;
-            _selectedDealer = null;
-          });
-        } else {
-          throw Exception('Failed to add item: ${response.body}');
-        }
-      } catch (e) {
-        setState(() {
-          _resultMessage = 'Failed to add item: $e';
-          _resultIcon = Icons.error;
-          _isLoading = false;
-        });
-      }
+      _addItem();
+    } else {
+      _showErrorDialog('Please fill in all fields');
     }
   }
 
-  void _showErrorSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
+  Future<void> _addItem() async {
+    final String item = _itemController.text;
+    final int quantity = int.parse(_quantityController.text);
+    final String batchNo = _batchNoController.text;
+    final String manufactureDate = _manufactureDate!.toIso8601String();
+    final String expiryDate = _expiryDate!.toIso8601String();
+
+    final url = Uri.parse('$mainUrl/add-item');
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'item': item,
+          'quantity': quantity,
+          'batchNo': batchNo,
+          'manufactureDate': manufactureDate,
+          'expiryDate': expiryDate,
+          'dealerName': _selectedDealer,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _resultMessage = 'Item added successfully';
+          _resultIcon = Icons.check;
+          _isLoading = false;
+        });
+        _itemController.clear();
+        _quantityController.clear();
+        _batchNoController.clear();
+        setState(() {
+          _manufactureDate = null;
+          _expiryDate = null;
+          _selectedDealer = null;
+        });
+        _showSuccessDialog(_resultMessage!);
+      } else {
+        throw Exception('Failed to add item: ${response.body}');
+      }
+    } catch (e) {
+      setState(() {
+        _resultMessage = 'Failed to add item: $e';
+        _resultIcon = Icons.error;
+        _isLoading = false;
+      });
+      _showErrorDialog(_resultMessage!);
+    }
+  }
+
+  void _showSuccessDialog(String message) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Success'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+          backgroundColor: Colors.green[100],
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final inputDecoration = InputDecoration(
-      border: OutlineInputBorder(),
-      labelStyle: TextStyle(color: Colors.blue),
-      focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.blue, width: 2.0),
-      ),
-    );
-
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add items"),
+        title: const Text("Add Items"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 TextFormField(
                   controller: _itemController,
-                  decoration: inputDecoration.copyWith(
+                  decoration: const InputDecoration(
                     labelText: 'Item',
+                    prefixIcon: Icon(Icons.shopping_bag),
+                    border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -194,11 +236,13 @@ class _AddState extends State<Add> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _quantityController,
-                  decoration: inputDecoration.copyWith(
+                  decoration: const InputDecoration(
                     labelText: 'Quantity',
+                    prefixIcon: Icon(Icons.format_list_numbered),
+                    border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (value) {
@@ -211,11 +255,13 @@ class _AddState extends State<Add> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _batchNoController,
-                  decoration: inputDecoration.copyWith(
+                  decoration: const InputDecoration(
                     labelText: 'Batch No',
+                    prefixIcon: Icon(Icons.confirmation_number),
+                    border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -224,44 +270,21 @@ class _AddState extends State<Add> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedDealer,
-                    items: _dealerNames.map((String dealer) {
-                      return DropdownMenuItem<String>(
-                        value: dealer,
-                        child: Text(
-                          dealer,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (String? value) {
-                      setState(() {
-                        _selectedDealer = value;
-                      });
-                    },
-                    decoration: inputDecoration.copyWith(
-                      labelText: 'Select Dealer',
-                    ),
+                const SizedBox(height: 16),
+                ListTile(
+                  title: Text(
+                    _selectedDealer ?? 'Select Dealer',
                     style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
+                      color:
+                          _selectedDealer == null ? Colors.grey : Colors.black,
                     ),
-                    icon: Icon(Icons.arrow_drop_down),
-                    iconSize: 32,
-                    iconEnabledColor: Colors.blue,
-                    dropdownColor: Colors.white,
-                    elevation: 8,
-                    borderRadius: BorderRadius.circular(8),
                   ),
+                  onTap: () {
+                    _showDealerPicker();
+                  },
+                  leading: const Icon(Icons.person),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 ListTile(
                   title: Text(
                     _manufactureDate == null
@@ -269,69 +292,101 @@ class _AddState extends State<Add> {
                         : 'Manufacture Date: ${_manufactureDate!.toLocal().toString().split(' ')[0]}',
                     style: TextStyle(
                       color:
-                          _manufactureDate == null ? Colors.red : Colors.black,
+                          _manufactureDate == null ? Colors.grey : Colors.black,
                     ),
                   ),
-                  trailing: Icon(Icons.calendar_today),
                   onTap: () => _selectDate(context, true),
+                  leading: const Icon(Icons.calendar_today),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 ListTile(
                   title: Text(
                     _expiryDate == null
                         ? 'Select Expiry Date'
                         : 'Expiry Date: ${_expiryDate!.toLocal().toString().split(' ')[0]}',
                     style: TextStyle(
-                      color: _expiryDate == null ? Colors.red : Colors.black,
+                      color: _expiryDate == null ? Colors.grey : Colors.black,
                     ),
                   ),
-                  trailing: Icon(Icons.calendar_today),
                   onTap: () => _selectDate(context, false),
+                  leading: const Icon(Icons.calendar_today),
                 ),
-                SizedBox(height: 20),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: _submitForm,
-                  child: Text('Add Item'),
+                  onPressed: _isLoading ? null : _submitForm,
                   style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
                     backgroundColor: Colors.blue,
-                    foregroundColor: Colors.black,
-                    padding: EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
+                  child: _isLoading
+                      ? const CircularProgressIndicator()
+                      : const Text('Add Item'),
                 ),
-                SizedBox(height: 20),
-                if (_resultMessage != null)
-                  Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: _resultMessage!.contains('successfully')
-                          ? Colors.green
-                          : Colors.red,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          _resultIcon,
-                          color: Colors.white,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          _resultMessage!,
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  void _showDealerPicker() {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select Dealer'),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: 300, // Set a maximum height for the dialog
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _dealerNames.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final dealer = _dealerNames[index];
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.blue),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: ListTile(
+                          title: Text(
+                            dealer,
+                            style: const TextStyle(color: Colors.blue),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _selectedDealer = dealer;
+                            });
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -5,13 +5,12 @@ import 'package:svp/Dealer.dart';
 import 'package:svp/add_product.dart';
 import 'package:svp/buy.dart';
 import 'package:svp/main.dart' as MainApp;
-
 import 'package:svp/report.dart';
 import 'package:svp/sell.dart'; // Ensure this file is present
 
 class Home extends StatelessWidget {
   final String username;
-  const Home({required this.username, Key? key}) : super(key: key);
+  const Home({required this.username, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +23,7 @@ class Home extends StatelessWidget {
 
 class Page extends StatefulWidget {
   final String username;
-  const Page({required this.username, Key? key}) : super(key: key);
+  const Page({required this.username, super.key});
 
   @override
   _PageState createState() => _PageState();
@@ -58,24 +57,24 @@ class _PageState extends State<Page> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             UserAccountsDrawerHeader(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Colors.blue, Colors.purple],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
               ),
-              currentAccountPicture: CircleAvatar(
+              currentAccountPicture: const CircleAvatar(
                 backgroundImage: AssetImage('assets/images/clock.png'),
               ),
               accountName: Text(
                 widget.username,
-                style:
-                    TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.white),
               ),
               accountEmail: Text(
                 widget.username,
-                style: TextStyle(color: Colors.white70),
+                style: const TextStyle(color: Colors.white70),
               ),
             ),
             _buildDrawerItem(Icons.home, 'Home', () {
@@ -108,7 +107,7 @@ class _PageState extends State<Page> {
                   context,
                   [
                     _buildButtonData('Sell', Icons.sell, Colors.blue, () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (context) => const Sell()),
                       );

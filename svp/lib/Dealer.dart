@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 class Dealer extends StatefulWidget {
-  const Dealer({Key? key}) : super(key: key);
+  const Dealer({super.key});
 
   @override
   State<Dealer> createState() => _DealerState();
@@ -15,24 +16,11 @@ class _DealerState extends State<Dealer> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _phoneNoController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _logoController = TextEditingController();
+  final TextEditingController _panController = TextEditingController();
 
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return Center(
-            child: CircularProgressIndicator(
-              valueColor:
-                  AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-            ),
-          );
-        },
-      );
-
-      final url = Uri.parse('http://192.168.101.3:5000/add-dealer');
+      final url = Uri.parse('http://192.168.0.101:5000/add-dealer');
 
       final response = await http.post(
         url,
@@ -44,34 +32,59 @@ class _DealerState extends State<Dealer> {
           'address': _addressController.text,
           'phoneNo': _phoneNoController.text,
           'email': _emailController.text,
-          'logo': _logoController.text,
+          'panno': _panController.text,
         }),
       );
 
+      IconData iconData;
+      String message;
+      String title;
+
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Dealer added successfully')),
-        );
+        iconData = Icons.check_circle;
+        title = 'Success';
+        message = 'Dealer added successfully';
         _nameController.clear();
         _addressController.clear();
         _phoneNoController.clear();
         _emailController.clear();
-        _logoController.clear();
+        _panController.clear();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add dealer')),
-        );
+        iconData = Icons.error;
+        title = 'Error';
+        message = 'Failed to add dealer';
       }
 
-      // Hide the dialog
-      Navigator.pop(context);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Row(
+              children: [
+                Icon(iconData),
+                const SizedBox(width: 10),
+                Text(title),
+              ],
+            ),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final inputDecoration = InputDecoration(
-      border: OutlineInputBorder(),
+      border: const OutlineInputBorder(),
       labelStyle: TextStyle(color: Theme.of(context).primaryColor),
       focusedBorder: OutlineInputBorder(
         borderSide:
@@ -96,7 +109,7 @@ class _DealerState extends State<Dealer> {
                   controller: _nameController,
                   decoration: inputDecoration.copyWith(
                     labelText: 'Name',
-                    prefixIcon: Icon(Icons.person),
+                    prefixIcon: const Icon(Symbols.person),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -105,12 +118,12 @@ class _DealerState extends State<Dealer> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _addressController,
                   decoration: inputDecoration.copyWith(
                     labelText: 'Address',
-                    prefixIcon: Icon(Icons.location_on),
+                    prefixIcon: const Icon(Symbols.location_on),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -119,12 +132,12 @@ class _DealerState extends State<Dealer> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _phoneNoController,
                   decoration: inputDecoration.copyWith(
                     labelText: 'Phone Number',
-                    prefixIcon: Icon(Icons.phone),
+                    prefixIcon: const Icon(Symbols.phone),
                   ),
                   keyboardType: TextInputType.phone,
                   validator: (value) {
@@ -134,12 +147,12 @@ class _DealerState extends State<Dealer> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
                   decoration: inputDecoration.copyWith(
                     labelText: 'Email',
-                    prefixIcon: Icon(Icons.email),
+                    prefixIcon: const Icon(Symbols.email),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -149,36 +162,37 @@ class _DealerState extends State<Dealer> {
                     return null;
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 TextFormField(
-                  controller: _logoController,
+                  controller: _panController,
                   decoration: inputDecoration.copyWith(
-                    labelText: 'Logo (URL)',
-                    prefixIcon: Icon(Icons.image),
+                    labelText: 'Pan no',
+                    prefixIcon: const Icon(Symbols.id_card),
                   ),
-                  keyboardType: TextInputType.url,
+                  keyboardType: TextInputType.number,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the logo URL';
+                      return 'Please enter the pan no';
                     }
                     return null;
                   },
                 ),
-                SizedBox(height: 32),
+                const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: () {
                     _submitForm();
                   },
-                  child: Text('Add Dealer'),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Theme.of(context).primaryColor,
-                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                    textStyle: TextStyle(fontSize: 16),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 15),
+                    textStyle: const TextStyle(fontSize: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
+                  child: const Text('Add Dealer'),
                 ),
               ],
             ),
@@ -191,7 +205,7 @@ class _DealerState extends State<Dealer> {
 
 void main() {
   runApp(MaterialApp(
-    home: Dealer(),
+    home: const Dealer(),
     theme: ThemeData(
       primaryColor: Colors.purple,
       visualDensity: VisualDensity.adaptivePlatformDensity,

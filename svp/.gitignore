@@ -30,7 +30,11 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
-!/build/app/outputs/flutter-apk
+# Ignore all APK files
+*.apk
+
+# But not this specific APK file
+!/build/app/outputs/flutter-apk/app-release.apk
 # Symbolication related
 app.*.symbols
 

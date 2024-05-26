@@ -72,6 +72,10 @@ class _CheckState extends State<Check> {
                           'Batch No: ${product['batch_no']}',
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
+                        Text(
+                          'Quantity: ${product['quantity']}',
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
                       ],
                     ),
                   ),

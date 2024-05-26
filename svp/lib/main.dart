@@ -238,7 +238,7 @@ class _HomePageState extends State<HomePage> {
     final success = await _performLogin(email, password);
     if (success) {
       _saveCredentials(email, password);
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Home(username: email)),
       );
@@ -260,7 +260,7 @@ class _HomePageState extends State<HomePage> {
       DateTime now = DateTime.now();
       final difference = now.difference(storedDateTime).inDays;
       if (difference <= 13) {
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => Home(username: storedEmail)),
         );

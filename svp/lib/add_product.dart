@@ -7,7 +7,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key, Key? key1});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +16,16 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        inputDecorationTheme: const InputDecorationTheme(
+          border: OutlineInputBorder(),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blueAccent),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blue, width: 2.0),
+          ),
+          labelStyle: TextStyle(color: Colors.blueAccent),
+        ),
       ),
       home: const Add(),
     );
@@ -23,7 +33,7 @@ class MyApp extends StatelessWidget {
 }
 
 class Add extends StatefulWidget {
-  const Add({super.key, Key? key2});
+  const Add({super.key});
 
   @override
   State<Add> createState() => _AddState();
@@ -34,11 +44,12 @@ class _AddState extends State<Add> {
   final TextEditingController _itemController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _batchNoController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
   DateTime? _manufactureDate;
   DateTime? _expiryDate;
   String? _selectedDealer;
   List<String> _dealerNames = [];
-  bool _isLoading = false;
+
   String? _resultMessage;
   IconData? _resultIcon;
 
@@ -55,6 +66,7 @@ class _AddState extends State<Add> {
     _itemController.dispose();
     _quantityController.dispose();
     _batchNoController.dispose();
+    _priceController.dispose();
     super.dispose();
   }
 
@@ -125,9 +137,7 @@ class _AddState extends State<Add> {
         _manufactureDate != null &&
         _expiryDate != null &&
         _selectedDealer != null) {
-      setState(() {
-        _isLoading = true;
-      });
+     
       _addItem();
     } else {
       _showErrorDialog('Please fill in all fields');
@@ -140,6 +150,7 @@ class _AddState extends State<Add> {
     final String batchNo = _batchNoController.text;
     final String manufactureDate = _manufactureDate!.toIso8601String();
     final String expiryDate = _expiryDate!.toIso8601String();
+    final double price = double.parse(_priceController.text);
 
     final url = Uri.parse('$mainUrl/add-item');
     try {
@@ -154,6 +165,7 @@ class _AddState extends State<Add> {
           'batchNo': batchNo,
           'manufactureDate': manufactureDate,
           'expiryDate': expiryDate,
+          'price': price,
           'dealerName': _selectedDealer,
         }),
       );
@@ -162,11 +174,12 @@ class _AddState extends State<Add> {
         setState(() {
           _resultMessage = 'Item added successfully';
           _resultIcon = Icons.check;
-          _isLoading = false;
+     
         });
         _itemController.clear();
         _quantityController.clear();
         _batchNoController.clear();
+        _priceController.clear();
         setState(() {
           _manufactureDate = null;
           _expiryDate = null;
@@ -180,7 +193,7 @@ class _AddState extends State<Add> {
       setState(() {
         _resultMessage = 'Failed to add item: $e';
         _resultIcon = Icons.error;
-        _isLoading = false;
+      
       });
       _showErrorDialog(_resultMessage!);
     }
@@ -227,7 +240,6 @@ class _AddState extends State<Add> {
                   decoration: const InputDecoration(
                     labelText: 'Item',
                     prefixIcon: Icon(Icons.shopping_bag),
-                    border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -242,7 +254,6 @@ class _AddState extends State<Add> {
                   decoration: const InputDecoration(
                     labelText: 'Quantity',
                     prefixIcon: Icon(Icons.format_list_numbered),
-                    border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (value) {
@@ -261,11 +272,28 @@ class _AddState extends State<Add> {
                   decoration: const InputDecoration(
                     labelText: 'Batch No',
                     prefixIcon: Icon(Icons.confirmation_number),
-                    border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter the batch number';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _priceController,
+                  decoration: const InputDecoration(
+                    labelText: 'Price',
+                    prefixIcon: Icon(Icons.attach_money),
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the price';
+                    }
+                    if (double.tryParse(value) == null) {
+                      return 'Please enter a valid price';
                     }
                     return null;
                   },
@@ -312,8 +340,8 @@ class _AddState extends State<Add> {
                   leading: const Icon(Icons.calendar_today),
                 ),
                 const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _submitForm,
+           ElevatedButton(
+                  onPressed:  _submitForm,
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.blue,
@@ -322,10 +350,9 @@ class _AddState extends State<Add> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text('Add Item'),
-                ),
+                  child: const Text('Add Item'),
+                )
+
               ],
             ),
           ),
@@ -342,7 +369,7 @@ class _AddState extends State<Add> {
           title: const Text('Select Dealer'),
           content: SizedBox(
             width: double.maxFinite,
-            height: 300, // Set a maximum height for the dialog
+            height: 300,
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

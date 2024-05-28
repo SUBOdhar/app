@@ -11,7 +11,7 @@ class Check extends StatefulWidget {
 
 class _CheckState extends State<Check> {
   List products = [];
-  final mainurl = "http://192.168.0.103:5000";
+  final mainurl = "https://api.svp.com.np";
   @override
   void initState() {
     super.initState();

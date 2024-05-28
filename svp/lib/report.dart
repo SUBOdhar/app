@@ -85,7 +85,7 @@ class _ReportState extends State<Report> {
 
   Future<void> fetchOptions(String endpoint, List<String> targetList) async {
     final response =
-        await http.get(Uri.parse('http://192.168.0.103:5000$endpoint'));
+        await http.get(Uri.parse('https://api.svp.com.np$endpoint'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       targetList.addAll(data.cast<String>());
@@ -110,7 +110,7 @@ class _ReportState extends State<Report> {
       String? customerName,
       String? startDate,
       String? endDate}) async {
-    String apiUrl = 'http://192.168.0.103:5000/daily-report?date=$date';
+    String apiUrl = 'https://api.svp.com.np/daily-report?date=$date';
 
     if (dealerName != null) {
       apiUrl += '&dealer_name=$dealerName';

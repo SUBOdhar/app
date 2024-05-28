@@ -59,7 +59,7 @@ class _AddState extends State<Add> {
   String? _resultMessage;
   IconData? _resultIcon;
 
-  final mainUrl = "http://192.168.0.103:5000";
+  final mainUrl = "https://api.svp.com.np";
 
   @override
   void initState() {

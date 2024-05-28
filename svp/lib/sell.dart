@@ -61,7 +61,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
   final _customerNameController = TextEditingController();
   final _phoneNoController = TextEditingController();
   final _addressController = TextEditingController();
-  final _apiUrl = 'http://192.168.0.103:5000';
+  final _apiUrl = 'https://api.svp.com.np';
 
   final _quantityfocus = FocusNode();
   final _addressfocus = FocusNode();

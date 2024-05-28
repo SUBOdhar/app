@@ -20,7 +20,7 @@ class _DealerState extends State<Dealer> {
 
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      final url = Uri.parse('http://192.168.0.101:5000/add-dealer');
+      final url = Uri.parse('http://192.168.0.103:5000/add-dealer');
 
       final response = await http.post(
         url,

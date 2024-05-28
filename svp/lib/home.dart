@@ -109,7 +109,7 @@ class _PageState extends State<Page> {
                     _buildButtonData('Sell', Icons.sell, Colors.blue, () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) =>  const Sell()),
+                        MaterialPageRoute(builder: (context) =>  Sell()),
                       );
                     }),
                     _buildButtonData('Buy', Icons.shopping_cart, Colors.green,

@@ -63,6 +63,11 @@ class _SellProductScreenState extends State<SellProductScreen> {
   final _addressController = TextEditingController();
   final _apiUrl = 'http://192.168.0.103:5000';
 
+  final _quantityfocus = FocusNode();
+  final _addressfocus = FocusNode();
+  final _customernamefocus = FocusNode();
+  final _phonenofocus = FocusNode();
+
   List<Product> _products = [];
   Product? _selectedProduct;
   double _estimatedPrice = 0.0;
@@ -81,6 +86,11 @@ class _SellProductScreenState extends State<SellProductScreen> {
     _customerNameController.dispose();
     _phoneNoController.dispose();
     _addressController.dispose();
+    _quantityfocus.dispose();
+    _addressfocus.dispose();
+    _customernamefocus.dispose();
+    _phonenofocus.dispose();
+
     super.dispose();
   }
 
@@ -226,6 +236,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
                     const SizedBox(height: 16.0),
                     TextFormField(
                       controller: _quantityController,
+                      focusNode: _quantityfocus,
                       decoration: const InputDecoration(labelText: 'Quantity'),
                       keyboardType: TextInputType.number,
                       validator: (value) {
@@ -240,6 +251,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
                       decoration:
                           const InputDecoration(labelText: 'Customer Name'),
                       controller: _customerNameController,
+                      focusNode: _customernamefocus,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter customer name';
@@ -251,6 +263,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
                     TextFormField(
                       decoration: const InputDecoration(labelText: 'Phone No.'),
                       controller: _phoneNoController,
+                      focusNode: _phonenofocus,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter phone number';
@@ -262,6 +275,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
                     TextFormField(
                       decoration: const InputDecoration(labelText: 'Address'),
                       controller: _addressController,
+                      focusNode: _addressfocus,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter address';

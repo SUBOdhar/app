@@ -45,6 +45,12 @@ class _AddState extends State<Add> {
   final TextEditingController _quantityController = TextEditingController();
   final TextEditingController _batchNoController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+
+  final _itemfocus = FocusNode();
+  final _quantityfocus = FocusNode();
+  final _batchnofocus = FocusNode();
+  final _pricefocus = FocusNode();
+
   DateTime? _manufactureDate;
   DateTime? _expiryDate;
   String? _selectedDealer;
@@ -67,6 +73,11 @@ class _AddState extends State<Add> {
     _quantityController.dispose();
     _batchNoController.dispose();
     _priceController.dispose();
+    _itemfocus.dispose();
+    _pricefocus.dispose();
+    _batchnofocus.dispose();
+    _pricefocus.dispose();
+
     super.dispose();
   }
 
@@ -137,7 +148,6 @@ class _AddState extends State<Add> {
         _manufactureDate != null &&
         _expiryDate != null &&
         _selectedDealer != null) {
-     
       _addItem();
     } else {
       _showErrorDialog('Please fill in all fields');
@@ -174,7 +184,6 @@ class _AddState extends State<Add> {
         setState(() {
           _resultMessage = 'Item added successfully';
           _resultIcon = Icons.check;
-     
         });
         _itemController.clear();
         _quantityController.clear();
@@ -193,7 +202,6 @@ class _AddState extends State<Add> {
       setState(() {
         _resultMessage = 'Failed to add item: $e';
         _resultIcon = Icons.error;
-      
       });
       _showErrorDialog(_resultMessage!);
     }
@@ -237,6 +245,7 @@ class _AddState extends State<Add> {
               children: <Widget>[
                 TextFormField(
                   controller: _itemController,
+                  focusNode: _itemfocus,
                   decoration: const InputDecoration(
                     labelText: 'Item',
                     prefixIcon: Icon(Icons.shopping_bag),
@@ -251,6 +260,7 @@ class _AddState extends State<Add> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _quantityController,
+                  focusNode: _quantityfocus,
                   decoration: const InputDecoration(
                     labelText: 'Quantity',
                     prefixIcon: Icon(Icons.format_list_numbered),
@@ -269,6 +279,7 @@ class _AddState extends State<Add> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _batchNoController,
+                  focusNode: _batchnofocus,
                   decoration: const InputDecoration(
                     labelText: 'Batch No',
                     prefixIcon: Icon(Icons.confirmation_number),
@@ -283,6 +294,7 @@ class _AddState extends State<Add> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _priceController,
+                  focusNode: _pricefocus,
                   decoration: const InputDecoration(
                     labelText: 'Price',
                     prefixIcon: Icon(Icons.attach_money),
@@ -340,8 +352,8 @@ class _AddState extends State<Add> {
                   leading: const Icon(Icons.calendar_today),
                 ),
                 const SizedBox(height: 20),
-           ElevatedButton(
-                  onPressed:  _submitForm,
+                ElevatedButton(
+                  onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.blue,
@@ -352,7 +364,6 @@ class _AddState extends State<Add> {
                   ),
                   child: const Text('Add Item'),
                 )
-
               ],
             ),
           ),

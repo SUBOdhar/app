@@ -18,6 +18,23 @@ class _DealerState extends State<Dealer> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _panController = TextEditingController();
 
+  final _namefocus = FocusNode();
+  final _emailfocus = FocusNode();
+  final _pannofocus = FocusNode();
+  final _addressfocus = FocusNode();
+  final _phonenofocus = FocusNode();
+
+  @override
+  void dispose() {
+    _namefocus.dispose();
+    _emailfocus.dispose();
+    _pannofocus.dispose();
+    _addressfocus.dispose();
+    _phonenofocus.dispose();
+
+    super.dispose();
+  }
+
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       final url = Uri.parse('http://192.168.0.103:5000/add-dealer');
@@ -107,6 +124,7 @@ class _DealerState extends State<Dealer> {
               children: [
                 TextFormField(
                   controller: _nameController,
+                  focusNode: _namefocus,
                   decoration: inputDecoration.copyWith(
                     labelText: 'Name',
                     prefixIcon: const Icon(Symbols.person),
@@ -121,6 +139,7 @@ class _DealerState extends State<Dealer> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _addressController,
+                  focusNode: _addressfocus,
                   decoration: inputDecoration.copyWith(
                     labelText: 'Address',
                     prefixIcon: const Icon(Symbols.location_on),
@@ -135,6 +154,7 @@ class _DealerState extends State<Dealer> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _phoneNoController,
+                  focusNode: _phonenofocus,
                   decoration: inputDecoration.copyWith(
                     labelText: 'Phone Number',
                     prefixIcon: const Icon(Symbols.phone),
@@ -150,6 +170,7 @@ class _DealerState extends State<Dealer> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _emailController,
+                  focusNode: _emailfocus,
                   decoration: inputDecoration.copyWith(
                     labelText: 'Email',
                     prefixIcon: const Icon(Symbols.email),
@@ -165,6 +186,7 @@ class _DealerState extends State<Dealer> {
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _panController,
+                  focusNode: _pannofocus,
                   decoration: inputDecoration.copyWith(
                     labelText: 'Pan no',
                     prefixIcon: const Icon(Symbols.id_card),

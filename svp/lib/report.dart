@@ -7,7 +7,7 @@ void main() {
 }
 
 class ReportDataApp extends StatelessWidget {
-  const ReportDataApp({Key? key}) : super(key: key);
+  const ReportDataApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -38,21 +38,20 @@ class ProductTransaction {
     this.customerName,
   });
 
-  factory ProductTransaction.fromJson(Map<String, dynamic> json,
-      {bool isSold = false}) {
+  factory ProductTransaction.fromJson(Map<String, dynamic> json) {
     return ProductTransaction(
       item: json['item'],
       quantity: json['quantity'],
-      date: isSold ? json['sale_date'] ?? '' : json['added_date'] ?? '',
-      totalPrice: isSold ? json['total_price']?.toDouble() : null,
-      dealerName: isSold ? null : json['dealer_name'],
-      customerName: isSold ? json['customer_name'] : null,
+      date: json['date'] ?? '',
+      totalPrice: json['totalPrice']?.toDouble(),
+      dealerName: json['dealerName'],
+      customerName: json['customerName'],
     );
   }
 }
 
 class Report extends StatefulWidget {
-  const Report({Key? key}) : super(key: key);
+  const Report({super.key});
 
   @override
   State<Report> createState() => _ReportState();
@@ -135,7 +134,7 @@ class _ReportState extends State<Report> {
           .toList();
 
       List<ProductTransaction> soldProducts = (data['sold_products'] as List)
-          .map((item) => ProductTransaction.fromJson(item, isSold: true))
+          .map((item) => ProductTransaction.fromJson(item))
           .toList();
 
       return {

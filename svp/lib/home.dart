@@ -3,10 +3,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:svp/Check.dart';
 import 'package:svp/Dealer.dart';
 import 'package:svp/add_product.dart';
-import 'package:svp/buy.dart';
-import 'package:svp/main.dart' as MainApp;
+import 'package:svp/clear.dart';
+import 'package:svp/login.dart' as MainApp;
 import 'package:svp/report.dart';
-import 'package:svp/sell.dart'; // Ensure this file is present
+import 'package:svp/sell.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:svp/version.dart';
 
 class Home extends StatelessWidget {
   final String username;
@@ -29,8 +31,81 @@ class Page extends StatefulWidget {
   _PageState createState() => _PageState();
 }
 
-class _PageState extends State<Page> {
+class _PageState extends State<Page> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final VersionService _versionService = VersionService();
+  String _message = '';
+  String _serverVersion = '';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _checkVersion();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkVersion();
+    }
+  }
+
+  Future<void> _checkVersion() async {
+    final result = await _versionService.checkVersion();
+    setState(() {
+      _message = result['message'];
+      if (result['status'] == 'update_needed') {
+        _serverVersion = result['global_version'];
+        _showUpdateDialog();
+      } else {
+        _serverVersion = '';
+      }
+    });
+  }
+
+  void _showUpdateDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Update Available'),
+          content: Text(
+              'A new version ($_serverVersion) is available. Please update to continue.'),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cancel')),
+            TextButton(
+              onPressed: () {
+                launchURLBrowser() async {
+                  var url =
+                      Uri.parse("https://github.com/SUBOdhar/app_all/releases");
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url);
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                }
+
+                Navigator.of(context).pop();
+              },
+              child: const Text('Update'),
+            )
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +165,7 @@ class _PageState extends State<Page> {
               prefs.remove('timestamp');
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const MainApp.MyApp()),
+                MaterialPageRoute(builder: (context) => const MainApp.Login()),
               );
             }),
           ],
@@ -109,14 +184,15 @@ class _PageState extends State<Page> {
                     _buildButtonData('Sell', Icons.sell, Colors.blue, () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) =>  Sell()),
+                        MaterialPageRoute(builder: (context) => const Sell()),
                       );
                     }),
-                    _buildButtonData('Buy', Icons.shopping_cart, Colors.green,
+                    _buildButtonData(
+                        'Clear data', Icons.cleaning_services, Colors.green,
                         () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const Buy()),
+                        MaterialPageRoute(builder: (context) => const Clear()),
                       );
                     }),
                   ],

@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class Sell extends StatelessWidget {
+  const Sell({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -20,7 +22,7 @@ class Sell extends StatelessWidget {
           labelStyle: TextStyle(color: Colors.blueAccent),
         ),
       ),
-      home: SellProductScreen(),
+      home: const SellProductScreen(),
     );
   }
 }
@@ -51,6 +53,8 @@ class Product {
 }
 
 class SellProductScreen extends StatefulWidget {
+  const SellProductScreen({super.key});
+
   @override
   _SellProductScreenState createState() => _SellProductScreenState();
 }
@@ -96,7 +100,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
 
   Future<void> _fetchProducts() async {
     try {
-      final response = await http.get(Uri.parse(_apiUrl + '/products'));
+      final response = await http.get(Uri.parse('$_apiUrl/products'));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -147,7 +151,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
         };
 
         final response = await http.post(
-          Uri.parse(_apiUrl + '/sell'),
+          Uri.parse('$_apiUrl/sell'),
           headers: {'Content-Type': 'application/json'},
           body: json.encode(payload),
         );
@@ -198,7 +202,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
         title: const Text('Sell Product'),
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Form(
@@ -232,7 +236,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
                               return null;
                             },
                           )
-                        : SizedBox(), // Handle case where products are not fetched yet
+                        : const SizedBox(), // Handle case where products are not fetched yet
                     const SizedBox(height: 16.0),
                     TextFormField(
                       controller: _quantityController,

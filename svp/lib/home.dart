@@ -36,6 +36,7 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
   final VersionService _versionService = VersionService();
   String _message = '';
   String _serverVersion = '';
+  String _updateurl = '';
 
   @override
   void initState() {
@@ -63,6 +64,7 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
       _message = result['message'];
       if (result['status'] == 'update_needed') {
         _serverVersion = result['global_version'];
+        _updateurl = result['url'];
         _showUpdateDialog();
       } else {
         _serverVersion = '';
@@ -88,8 +90,7 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
             TextButton(
               onPressed: () {
                 launchURLBrowser() async {
-                  var url =
-                      Uri.parse("https://github.com/SUBOdhar/app_all/releases");
+                  var url = Uri.parse(_updateurl);
                   if (await canLaunchUrl(url)) {
                     await launchUrl(url);
                   } else {

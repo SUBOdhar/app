@@ -46,7 +46,9 @@ if release_info.returncode == 0:
     release_data = json.loads(release_info.stdout)
     if 'url' in release_data:
         existing_url = release_data['url']
+        print('already released')
         print(existing_url)
+
     else:
         existing_url = None
 else:

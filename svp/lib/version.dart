@@ -1,8 +1,11 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 class VersionService {
-  final String currentVersion = 'v0.0.095'; // Example client version
+  final String currentVersion = 'v0.0.005'; // Example client version
   final String serverUrl =
       'https://api.svp.com.np/version-manager'; // Update with your server details
 
@@ -14,13 +17,15 @@ class VersionService {
       body: jsonEncode({'version': currentVersion}),
     );
 
-    if (response.statusCode == 200) {
+    final responseData = jsonDecode(response.body);
+    if (response.statusCode == 200 && responseData['status'] == 'up_to_date') {
       return {'status': 'up_to_date', 'message': 'Version is up to date'};
-    } else if (response.statusCode == 400) {
-      final responseData = jsonDecode(response.body);
+    } else if (response.statusCode == 200 &&
+        responseData['status'] == 'update_needed') {
       return {
         'status': 'update_needed',
         'global_version': responseData['global_version'],
+        'url': responseData['url'],
         'message': 'New version available: ${responseData['global_version']}'
       };
     } else {

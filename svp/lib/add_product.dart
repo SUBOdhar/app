@@ -46,10 +46,10 @@ class _AddState extends State<Add> {
   final TextEditingController _batchNoController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
 
-  final _itemfocus = FocusNode();
-  final _quantityfocus = FocusNode();
-  final _batchnofocus = FocusNode();
-  final _pricefocus = FocusNode();
+  final FocusNode _itemfocus = FocusNode();
+  final FocusNode _quantityfocus = FocusNode();
+  final FocusNode _batchnofocus = FocusNode();
+  final FocusNode _pricefocus = FocusNode();
 
   DateTime? _manufactureDate;
   DateTime? _expiryDate;

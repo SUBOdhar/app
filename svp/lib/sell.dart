@@ -67,10 +67,10 @@ class _SellProductScreenState extends State<SellProductScreen> {
   final _addressController = TextEditingController();
   final _apiUrl = 'https://api.svp.com.np';
 
-  final _quantityfocus = FocusNode();
-  final _addressfocus = FocusNode();
-  final _customernamefocus = FocusNode();
-  final _phonenofocus = FocusNode();
+  final FocusNode _quantityfocus = FocusNode();
+  final FocusNode _addressfocus = FocusNode();
+  final FocusNode _customernamefocus = FocusNode();
+  final FocusNode _phonenofocus = FocusNode();
 
   List<Product> _products = [];
   Product? _selectedProduct;

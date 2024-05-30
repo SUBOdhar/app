@@ -18,11 +18,11 @@ class _DealerState extends State<Dealer> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _panController = TextEditingController();
 
-  final _namefocus = FocusNode();
-  final _emailfocus = FocusNode();
-  final _pannofocus = FocusNode();
-  final _addressfocus = FocusNode();
-  final _phonenofocus = FocusNode();
+  final FocusNode _namefocus = FocusNode();
+  final FocusNode _emailfocus = FocusNode();
+  final FocusNode _pannofocus = FocusNode();
+  final FocusNode _addressfocus = FocusNode();
+  final FocusNode _phonenofocus = FocusNode();
 
   @override
   void dispose() {

@@ -34,10 +34,8 @@ class Page extends StatefulWidget {
 class _PageState extends State<Page> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final VersionService _versionService = VersionService();
-  String _message = '';
   String _serverVersion = '';
-  String _updateurl = '';
-
+  Uri? _updateurl;
   @override
   void initState() {
     super.initState();
@@ -59,20 +57,47 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
   }
 
   Future<void> _checkVersion() async {
-    final result = await _versionService.checkVersion();
-    setState(() {
-      _message = result['message'];
-      if (result['status'] == 'update_needed') {
-        _serverVersion = result['global_version'];
-        _updateurl = result['url'];
-        _showUpdateDialog();
-      } else {
-        _serverVersion = '';
-      }
-    });
+    try {
+      final result = await _versionService.checkVersion();
+      print('API response: $result'); // Debugging statement
+
+      setState(() {
+        if (result['status'] == 'update_needed') {
+          _serverVersion = result['global_version'] ?? '';
+          String urlString = result['url'] ?? '';
+          print('Parsed URL String: $urlString'); // Debugging statement
+
+          if (urlString.isNotEmpty) {
+            _updateurl = Uri.tryParse(urlString);
+            if (_updateurl == null) {
+              print('Invalid URL: $urlString'); // Debugging statement
+            } else {
+              print('Parsed Uri: $_updateurl'); // Debugging statement
+            }
+          } else {
+            _updateurl = null;
+          }
+
+          _showUpdateDialog();
+        } else {
+          _serverVersion = '';
+        }
+      });
+    } catch (e) {
+      setState(() {
+        print('Error checking version: $e'); // Debugging statement
+      });
+    }
   }
 
   void _showUpdateDialog() {
+    if (_updateurl == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Update URL is empty')),
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -80,32 +105,42 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
         return AlertDialog(
           title: const Text('Update Available'),
           content: Text(
-              'A new version ($_serverVersion) is available. Please update to continue.'),
+            'A new version ($_serverVersion) is available. Please update to continue.',
+          ),
           actions: [
             TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Cancel')),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
             TextButton(
               onPressed: () {
-                launchURLBrowser() async {
-                  var url = Uri.parse(_updateurl);
-                  if (await canLaunchUrl(url)) {
-                    await launchUrl(url);
-                  } else {
-                    throw 'Could not launch $url';
-                  }
-                }
-
+                _launchURL();
                 Navigator.of(context).pop();
               },
               child: const Text('Update'),
-            )
+            ),
           ],
         );
       },
     );
+  }
+
+  Future<void> _launchURL() async {
+    if (_updateurl != null) {
+      if (await canLaunchUrl(_updateurl!)) {
+        await launchUrl(_updateurl!);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not launch $_updateurl')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Update URL is empty')),
+      );
+    }
   }
 
   @override

@@ -2,6 +2,7 @@ import re
 import subprocess
 import sys
 import json
+from colorama import Fore, Style
 
 
 def new_release():
@@ -14,7 +15,7 @@ def new_release():
 
 
 def exit_program():
-    print("Exiting program....")
+    print(Fore.RED, "Exiting program....")
     sys.exit(0)
 
 
@@ -35,7 +36,7 @@ if match:
     version_number = match.group(1)
     print(version_number)
 else:
-    print("No match found.")
+    print(Fore.RED, "No match found.")
     version_number = "unknown"  # Default version number if no match is found
     exit_program()
 
@@ -46,13 +47,13 @@ if release_info.returncode == 0:
     release_data = json.loads(release_info.stdout)
     if 'url' in release_data:
         existing_url = release_data['url']
-        print('already released')
+        print(Fore.GREEN, 'Already released')
         print(existing_url)
-
+        print(Style.RESET_ALL)
     else:
         existing_url = None
 else:
-    print("Error occurred while checking the release.")
+    print(Fore.RED, "Error occurred while checking the release.")
     exit_program()
 
 # Prepare the GitHub release command

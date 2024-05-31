@@ -1,9 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
 class VersionService {
   final String currentVersion = 'v0.0.005'; // Example client version
   final String serverUrl =

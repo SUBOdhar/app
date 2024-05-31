@@ -4,7 +4,7 @@ import 'package:svp/Check.dart';
 import 'package:svp/Dealer.dart';
 import 'package:svp/add_product.dart';
 import 'package:svp/clear.dart';
-import 'package:svp/login.dart' as MainApp;
+import 'package:svp/main.dart' as MainApp;
 import 'package:svp/report.dart';
 import 'package:svp/sell.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -49,12 +49,7 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _checkVersion();
-    }
-  }
+
 
   Future<void> _checkVersion() async {
     try {

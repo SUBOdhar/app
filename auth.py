@@ -14,7 +14,8 @@ with open('url', 'r') as file:
 
 with open('version', 'r') as file2:
     ver = file2.read()
-
+print(ver)
+print(content)
 # Latest version
 global_version = f'v{ver}'
 new_version_url = content
@@ -389,7 +390,7 @@ def version():
         }), 200
 
     # If versions match, return a success message
-    return jsonify({'message': 'Version is up to date'}), 200
+    return jsonify({'status': 'up_to_date', 'message': 'Version is up to date'}), 200
 
 
 if __name__ == '__main__':

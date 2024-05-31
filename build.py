@@ -1,5 +1,6 @@
 import os
 import subprocess
+from colorama import Fore
 
 original_directory = os.getcwd()
 os.chdir('svp')
@@ -23,4 +24,4 @@ if result.returncode == 0:
     subprocess.run('python release_github.py', shell=True)
     subprocess.run('python auth.py', shell=True)
 else:
-    print("Build failed. Skipping subsequent steps.")
+    print(Fore.RED, "Build failed. Skipping subsequent steps.")

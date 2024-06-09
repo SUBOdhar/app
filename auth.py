@@ -50,7 +50,8 @@ def create_database_and_tables():
                 address TEXT,
                 phone_no TEXT,
                 email TEXT,
-                panno NUMBER
+                panno NUMBER,
+                dd_reg TEXT
             )
         ''')
         cursor.execute('''
@@ -151,7 +152,8 @@ def get_customers():
 @app.route('/add-dealer', methods=['POST'])
 def add_dealer():
     data = request.get_json()
-    required_fields = ['name', 'address', 'phoneNo', 'email', 'panno']
+    required_fields = ['name', 'address',
+                       'phoneNo', 'email', 'panno', 'dd_reg']
     if not all(field in data for field in required_fields):
         missing_fields = [
             field for field in required_fields if field not in data]
@@ -161,9 +163,9 @@ def add_dealer():
         with sqlite3.connect('inventory.db') as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO dealers (name, address, phone_no, email, panno)
+                INSERT INTO dealers (name, address, phone_no, email, panno, dd_reg)
                 VALUES (?, ?, ?, ?, ?)
-            ''', (data['name'], data['address'], data['phoneNo'], data['email'], data['panno']))
+            ''', (data['name'], data['address'], data['phoneNo'], data['email'], data['panno'], data['dd_reg']))
             conn.commit()
         return jsonify({'message': 'Dealer added successfully', 'data': data}), 200
 
@@ -391,6 +393,27 @@ def version():
 
     # If versions match, return a success message
     return jsonify({'status': 'up_to_date', 'message': 'Version is up to date'}), 200
+
+
+@app.route('/notice', methods=['POST'])
+def notice():
+    data = request.get_json()
+    # List of required fields
+    required_fields = ['key']
+
+    # Check if all required fields are in the incoming data
+    if not all(field in data for field in required_fields):
+        missing_fields = [
+            field for field in required_fields if field not in data]
+        return jsonify({'message': f'Missing fields: {", ".join(missing_fields)}'}), 400
+
+    key = data['key']
+    with open('key', 'r') as file:
+        content = file.read
+    if not key in content:
+        return jsonify({'message': 'check'})
+    else:
+        return jsonify({'message': 'key check'})
 
 
 if __name__ == '__main__':

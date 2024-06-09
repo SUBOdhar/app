@@ -17,12 +17,14 @@ class _DealerState extends State<Dealer> {
   final TextEditingController _phoneNoController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _panController = TextEditingController();
+  final TextEditingController _DDREGController = TextEditingController();
 
   final FocusNode _namefocus = FocusNode();
   final FocusNode _emailfocus = FocusNode();
   final FocusNode _pannofocus = FocusNode();
   final FocusNode _addressfocus = FocusNode();
   final FocusNode _phonenofocus = FocusNode();
+  final FocusNode _DDREGfocus = FocusNode();
 
   @override
   void dispose() {
@@ -31,6 +33,7 @@ class _DealerState extends State<Dealer> {
     _pannofocus.dispose();
     _addressfocus.dispose();
     _phonenofocus.dispose();
+    _DDREGfocus.dispose();
 
     super.dispose();
   }
@@ -50,6 +53,7 @@ class _DealerState extends State<Dealer> {
           'phoneNo': _phoneNoController.text,
           'email': _emailController.text,
           'panno': _panController.text,
+          'dd_reg': _DDREGController.text,
         }),
       );
 
@@ -66,6 +70,7 @@ class _DealerState extends State<Dealer> {
         _phoneNoController.clear();
         _emailController.clear();
         _panController.clear();
+        _DDREGController.clear();
       } else {
         iconData = Icons.error;
         title = 'Error';
@@ -195,6 +200,22 @@ class _DealerState extends State<Dealer> {
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter the pan no';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _DDREGController,
+                  focusNode: _DDREGfocus,
+                  decoration: inputDecoration.copyWith(
+                    labelText: 'D.D. REG. NO',
+                    prefixIcon: const Icon(Icons.recent_actors_rounded),
+                  ),
+                  keyboardType: TextInputType.text,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the D.D. REG. No';
                     }
                     return null;
                   },

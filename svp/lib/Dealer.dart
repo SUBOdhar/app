@@ -127,12 +127,15 @@ class _DealerState extends State<Dealer> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                const SizedBox(
+                  width: 20,
+                ),
                 TextFormField(
                   controller: _nameController,
                   focusNode: _namefocus,
-                  decoration: inputDecoration.copyWith(
+                  decoration: const InputDecoration(
                     labelText: 'Name',
-                    prefixIcon: const Icon(Symbols.person),
+                    prefixIcon:  Icon(Symbols.person),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -145,9 +148,9 @@ class _DealerState extends State<Dealer> {
                 TextFormField(
                   controller: _addressController,
                   focusNode: _addressfocus,
-                  decoration: inputDecoration.copyWith(
+                  decoration: const InputDecoration(
                     labelText: 'Address',
-                    prefixIcon: const Icon(Symbols.location_on),
+                    prefixIcon:  Icon(Symbols.location_on),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -160,9 +163,9 @@ class _DealerState extends State<Dealer> {
                 TextFormField(
                   controller: _phoneNoController,
                   focusNode: _phonenofocus,
-                  decoration: inputDecoration.copyWith(
+                  decoration: const InputDecoration(
                     labelText: 'Phone Number',
-                    prefixIcon: const Icon(Symbols.phone),
+                    prefixIcon:  Icon(Symbols.phone),
                   ),
                   keyboardType: TextInputType.phone,
                   validator: (value) {
@@ -176,9 +179,9 @@ class _DealerState extends State<Dealer> {
                 TextFormField(
                   controller: _emailController,
                   focusNode: _emailfocus,
-                  decoration: inputDecoration.copyWith(
+                  decoration: const InputDecoration(
                     labelText: 'Email',
-                    prefixIcon: const Icon(Symbols.email),
+                    prefixIcon:  Icon(Symbols.email),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -192,9 +195,9 @@ class _DealerState extends State<Dealer> {
                 TextFormField(
                   controller: _panController,
                   focusNode: _pannofocus,
-                  decoration: inputDecoration.copyWith(
+                  decoration: const InputDecoration(
                     labelText: 'Pan no',
-                    prefixIcon: const Icon(Symbols.id_card),
+                    prefixIcon:  Icon(Symbols.id_card),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (value) {
@@ -208,9 +211,9 @@ class _DealerState extends State<Dealer> {
                 TextFormField(
                   controller: _DDREGController,
                   focusNode: _DDREGfocus,
-                  decoration: inputDecoration.copyWith(
+                  decoration: const InputDecoration(
                     labelText: 'D.D. REG. NO',
-                    prefixIcon: const Icon(Icons.recent_actors_rounded),
+                    prefixIcon:  Icon(Icons.recent_actors_rounded),
                   ),
                   keyboardType: TextInputType.text,
                   validator: (value) {

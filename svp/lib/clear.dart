@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class Clear extends StatelessWidget {
+class Clear extends StatefulWidget {
   const Clear({super.key});
 
+  @override
+  State<Clear> createState() => _ClearState();
+}
+
+class _ClearState extends State<Clear> {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(

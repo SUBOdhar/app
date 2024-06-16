@@ -2,22 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class Sell extends StatelessWidget {
+
+
+class Sell extends StatefulWidget {
   const Sell({super.key});
 
+  @override
+  State<Sell> createState() => _SellState();
+}
+
+class _SellState extends State<Sell> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Sell Product App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
         inputDecorationTheme: const InputDecorationTheme(
           border: OutlineInputBorder(),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.blueAccent),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
+            borderSide: BorderSide(color: Colors.blue, width: 2.0),
           ),
           labelStyle: TextStyle(color: Colors.blueAccent),
         ),
@@ -67,10 +75,10 @@ class _SellProductScreenState extends State<SellProductScreen> {
   final _addressController = TextEditingController();
   final _apiUrl = 'https://api.svp.com.np';
 
-  final FocusNode _quantityfocus = FocusNode();
-  final FocusNode _addressfocus = FocusNode();
-  final FocusNode _customernamefocus = FocusNode();
-  final FocusNode _phonenofocus = FocusNode();
+  final FocusNode _quantityFocus = FocusNode();
+  final FocusNode _addressFocus = FocusNode();
+  final FocusNode _customerNameFocus = FocusNode();
+  final FocusNode _phoneNoFocus = FocusNode();
 
   List<Product> _products = [];
   Product? _selectedProduct;
@@ -90,10 +98,10 @@ class _SellProductScreenState extends State<SellProductScreen> {
     _customerNameController.dispose();
     _phoneNoController.dispose();
     _addressController.dispose();
-    _quantityfocus.dispose();
-    _addressfocus.dispose();
-    _customernamefocus.dispose();
-    _phonenofocus.dispose();
+    _quantityFocus.dispose();
+    _addressFocus.dispose();
+    _customerNameFocus.dispose();
+    _phoneNoFocus.dispose();
 
     super.dispose();
   }
@@ -111,8 +119,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
         throw Exception('Failed to fetch products');
       }
     } catch (error) {
-      print('Error fetching products: $error');
-      // Handle error gracefully
+      _showErrorDialog('Failed to fetch products: $error');
     }
   }
 
@@ -136,7 +143,6 @@ class _SellProductScreenState extends State<SellProductScreen> {
 
     try {
       if (_selectedProduct != null) {
-        // Ensure productIds and batchNo have the same length
         List<int> productIds = [_selectedProduct!.id];
         List<String> batchNo = [_selectedProduct!.batchNo];
 
@@ -159,14 +165,13 @@ class _SellProductScreenState extends State<SellProductScreen> {
         final responseJson = json.decode(response.body);
 
         if (response.statusCode == 200) {
-          _showDialog('Success', responseJson['message'], Colors.green);
+          _showSuccessDialog('Success', responseJson['message']);
         } else {
-          _showDialog('Error', responseJson['message'], Colors.red);
+          _showErrorDialog(responseJson['message']);
         }
       }
     } catch (error) {
-      print('Error selling product: $error');
-      _showDialog('Error', 'Failed to sell product', Colors.red);
+      _showErrorDialog('Failed to sell product: $error');
     } finally {
       setState(() {
         _isLoading = false;
@@ -174,15 +179,15 @@ class _SellProductScreenState extends State<SellProductScreen> {
     }
   }
 
-  void _showDialog(String title, String message, Color color) {
-    showDialog(
+  void _showErrorDialog(String message) {
+    showDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(title),
+          title: const Text('Error'),
           content: Text(message),
-          backgroundColor: color,
-          actions: [
+          actions: <Widget>[
             TextButton(
               child: const Text('OK'),
               onPressed: () {
@@ -190,6 +195,29 @@ class _SellProductScreenState extends State<SellProductScreen> {
               },
             ),
           ],
+          backgroundColor: Colors.red[100],
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog(String title, String message) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+          backgroundColor: Colors.green[100],
         );
       },
     );
@@ -205,106 +233,125 @@ class _SellProductScreenState extends State<SellProductScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: ListView(
-                  children: [
-                    _products.isNotEmpty
-                        ? DropdownButtonFormField<Product>(
-                            value: _selectedProduct,
-                            items: _products
-                                .map((product) => DropdownMenuItem(
-                                      value: product,
-                                      child: Text(
-                                          '${product.name} - ${product.batchNo}'),
-                                    ))
-                                .toList(),
-                            onChanged: (product) {
-                              setState(() {
-                                _selectedProduct = product;
-                                _updateEstimatedPrice(); // Update estimated price when product changes
-                              });
-                            },
-                            decoration: const InputDecoration(
-                              labelText: 'Product',
-                              hintText: 'Select product',
-                            ),
-                            validator: (value) {
-                              if (_selectedProduct == null) {
-                                return 'Please select a product';
-                              }
-                              return null;
-                            },
-                          )
-                        : const SizedBox(), // Handle case where products are not fetched yet
-                    const SizedBox(height: 16.0),
-                    TextFormField(
-                      controller: _quantityController,
-                      focusNode: _quantityfocus,
-                      decoration: const InputDecoration(labelText: 'Quantity'),
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter quantity';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16.0),
-                    TextFormField(
-                      decoration:
-                          const InputDecoration(labelText: 'Customer Name'),
-                      controller: _customerNameController,
-                      focusNode: _customernamefocus,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter customer name';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16.0),
-                    TextFormField(
-                      decoration: const InputDecoration(labelText: 'Phone No.'),
-                      controller: _phoneNoController,
-                      focusNode: _phonenofocus,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter phone number';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16.0),
-                    TextFormField(
-                      decoration: const InputDecoration(labelText: 'Address'),
-                      controller: _addressController,
-                      focusNode: _addressfocus,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter address';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16.0),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _sellProduct();
-                        }
-                      },
-                      child: const Text('Sell Product'),
-                    ),
-                    const SizedBox(height: 16.0),
-                    Text(
-                      'Estimated Price: $_estimatedPrice',
-                      style: const TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _products.isNotEmpty
+                          ? DropdownButtonFormField<Product>(
+                              value: _selectedProduct,
+                              items: _products
+                                  .map((product) => DropdownMenuItem(
+                                        value: product,
+                                        child: Text(
+                                            '${product.name} - ${product.batchNo}'),
+                                      ))
+                                  .toList(),
+                              onChanged: (product) {
+                                setState(() {
+                                  _selectedProduct = product;
+                                  _updateEstimatedPrice();
+                                });
+                              },
+                              decoration: const InputDecoration(
+                                labelText: 'Product',
+                                hintText: 'Select product',
+                                prefixIcon: Icon(Icons.medication_outlined),
+                              ),
+                              validator: (value) {
+                                if (_selectedProduct == null) {
+                                  return 'Please select a product';
+                                }
+                                return null;
+                              },
+                            )
+                          : const SizedBox(),
+                      const SizedBox(height: 16.0),
+                      TextFormField(
+                        controller: _quantityController,
+                        focusNode: _quantityFocus,
+                        decoration: const InputDecoration(
+                          labelText: 'Quantity',
+                          prefixIcon: Icon(Icons.shopping_cart),
+                        ),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter quantity';
+                          }
+                          return null;
+                        },
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 16.0),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Customer Name',
+                          prefixIcon: Icon(Icons.person),
+                        ),
+                        controller: _customerNameController,
+                        focusNode: _customerNameFocus,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter customer name';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16.0),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Phone No.',
+                          prefixIcon: Icon(Icons.phone),
+                        ),
+                        controller: _phoneNoController,
+                        focusNode: _phoneNoFocus,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter phone number';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16.0),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Address',
+                          prefixIcon: Icon(Icons.location_on),
+                        ),
+                        controller: _addressController,
+                        focusNode: _addressFocus,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter address';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16.0),
+                      ListTile(
+                        title: Text(
+                          'Estimated Price: $_estimatedPrice',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        leading: const Icon(Icons.attach_money),
+                      ),
+                      const SizedBox(height: 20.0),
+                      ElevatedButton(
+                        onPressed: _sellProduct,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('Sell Product'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

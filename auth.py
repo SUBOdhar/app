@@ -2,23 +2,14 @@ from datetime import date
 import logging
 from flask import Flask, jsonify, request
 import sqlite3
+import random
+import string
 
 app = Flask(__name__)
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-# reads the url file for the latest url
-with open('url', 'r') as file:
-    content = file.read()
-
-with open('version', 'r') as file2:
-    ver = file2.read()
-print(ver)
-print(content)
-# Latest version
-global_version = f'v{ver}'
-new_version_url = content
 
 # Hardcoded valid credentials for the login endpoint
 valid_email = 'aryalsubodh4@gmail.com'
@@ -77,21 +68,65 @@ def create_database_and_tables():
         conn.commit()
     logging.info("SQLite database 'inventory.db' and all tables created.")
 
+    with sqlite3.connect('login_notification_data.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS login_key (
+                       id INTEGER PRIMARY KEY AUTOINCREMENT,
+                       user TEXT,
+                       login_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                       key TEXT
+                       )''')
+
+        cursor.execute('''
+     CREATE TABLE IF NOT EXISTS notifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    notification_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    body TEXT,
+    title TEXT,
+    key TEXT,
+    status INTEGER,
+    FOREIGN KEY(key) REFERENCES login_key(key)
+)
+''')
+        conn.commit()
+
 
 # Call the function to create the database and tables
 create_database_and_tables()
 
 
+def gen_key():
+    N = 7
+    res = ''.join(random.choices(string.ascii_uppercase + string.digits, k=N))
+    return res
+
+
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
+
     if not all(key in data for key in ['email', 'password', 'app']):
         return jsonify({'message': 'email, password, and app are required'}), 400
 
-    if data['email'] == valid_email and data['password'] == valid_password and data['app'] == 'svp_admin':
-        return jsonify({'message': 'Login successful'}), 200
-    else:
+    if data['email'] != valid_email or data['password'] != valid_password or data['app'] != 'svp_admin':
         return jsonify({'message': 'Invalid email or password'}), 401
+
+    key = str(gen_key())
+    with sqlite3.connect('login_notification_data.db') as conn:
+        cursor = conn.cursor()
+
+        # Ensure the key is unique
+        cursor.execute('SELECT 1 FROM login_key WHERE key = ?', (key,))
+        while cursor.fetchone() is not None:
+            key = str(gen_key())
+            cursor.execute('SELECT 1 FROM login_key WHERE key = ?', (key,))
+
+        cursor.execute(
+            'INSERT INTO login_key(user, key) VALUES (?, ?)', (valid_email, key))
+        conn.commit()
+
+    return jsonify({'message': 'Login successful', 'key': key}), 200
 
 
 @app.route('/add-item', methods=['POST'])
@@ -164,7 +199,7 @@ def add_dealer():
             cursor = conn.cursor()
             cursor.execute('''
                 INSERT INTO dealers (name, address, phone_no, email, panno, dd_reg)
-                VALUES (?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?)
             ''', (data['name'], data['address'], data['phoneNo'], data['email'], data['panno'], data['dd_reg']))
             conn.commit()
         return jsonify({'message': 'Dealer added successfully', 'data': data}), 200
@@ -263,7 +298,13 @@ def daily_report():
     customer_name = request.args.get('customer_name')
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
-
+    key = request.args.get('key')
+    with sqlite3.connect('login_notification_data.db') as connect:
+        cursor_key = connect.cursor()
+        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        dat = cursor_key.fetchall()
+        if not dat:
+            return jsonify({'message': 'authenticated'})
     try:
         with sqlite3.connect('inventory.db') as conn:
             cursor = conn.cursor()
@@ -371,6 +412,17 @@ def clear_data():
 def version():
     data = request.get_json()
 
+    # reads the url file for the latest url
+    with open('url', 'r') as file:
+        content = file.read()
+
+    with open('version', 'r') as file2:
+        ver = file2.read()
+    print(ver)
+    print(content)
+    # Latest version
+    global_version = f'v{ver}'
+    new_version_url = content.strip()
     # List of required fields
     required_fields = ['version']
 
@@ -384,6 +436,7 @@ def version():
 
     # Check if client version matches the global version
     if client_version != global_version:
+        print('update_needed')
         return jsonify({
             'status': 'update_needed',
             'global_version': global_version,
@@ -392,6 +445,7 @@ def version():
         }), 200
 
     # If versions match, return a success message
+    print('up_to_date')
     return jsonify({'status': 'up_to_date', 'message': 'Version is up to date'}), 200
 
 
@@ -408,12 +462,39 @@ def notice():
         return jsonify({'message': f'Missing fields: {", ".join(missing_fields)}'}), 400
 
     key = data['key']
-    with open('key', 'r') as file:
-        content = file.read
-    if not key in content:
-        return jsonify({'message': 'check'})
-    else:
-        return jsonify({'message': 'key check'})
+
+    # Check if the key exists in the database
+    with sqlite3.connect('login_notification_data.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT id FROM login_key WHERE key=?', (key,))
+        dd = cursor.fetchone()
+
+    if not dd:
+        return jsonify({'message': 'Authentication failed'}), 401
+
+    status = 0
+
+    # Fetch the notification
+    with sqlite3.connect('login_notification_data.db') as conn2:
+        cursor2 = conn2.cursor()
+        cursor2.execute(
+            'SELECT id,body, title FROM notifications WHERE key=? AND status=?', (key, status))
+        dd2 = cursor2.fetchall()
+
+    if not dd2:
+        return jsonify({'message': 'No notifications found'}), 404
+
+    id, body, title = dd2[0]
+
+    # Update the notification status
+    new_status = 1
+    with sqlite3.connect('login_notification_data.db') as conn3:
+        cursor3 = conn3.cursor()
+        cursor3.execute(
+            'UPDATE notifications SET status = ? WHERE key = ? AND id=?', (new_status, key, id))
+        conn3.commit()
+
+    return jsonify({'message': 'Authenticated', 'title': title, 'body': body})
 
 
 if __name__ == '__main__':

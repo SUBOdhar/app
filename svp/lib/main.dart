@@ -236,12 +236,16 @@ class _HomePageState extends State<HomePage> {
     }
 
     final success = await _performLogin(email, password);
-    if (success) {
-      _saveCredentials(email, password);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Home(username: email)),
-      );
+    if (success != null && success) {
+      final String? key = await _getStoredKey();
+      if (key != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Home(username: email)),
+        );
+      } else {
+        _showSnackBar('Login failed. Please try again.');
+      }
     } else {
       _showSnackBar('Login failed. Please try again.');
     }
@@ -269,14 +273,12 @@ class _HomePageState extends State<HomePage> {
           _buttonColor = const Color.fromRGBO(143, 148, 251, 1);
         });
       } else {
-        prefs.remove('email');
-        prefs.remove('password');
-        prefs.remove('timestamp');
+        await _clearStoredCredentials();
       }
     }
   }
 
-  Future<bool> _performLogin(String email, String password) async {
+  Future<bool?> _performLogin(String email, String password) async {
     Map<String, dynamic> data = {
       'email': email,
       'password': password,
@@ -295,8 +297,11 @@ class _HomePageState extends State<HomePage> {
       );
 
       if (response.statusCode == 200) {
+        final jsndata = jsonDecode(response.body);
+        final String key = jsndata['key'];
         print('Response body: ${response.body}');
         print('Login successful!');
+        await _saveCredentials(email, password, key);
         return true;
       } else if (response.statusCode == 401) {
         await _clearStoredCredentials();
@@ -319,13 +324,21 @@ class _HomePageState extends State<HomePage> {
     prefs.remove('email');
     prefs.remove('password');
     prefs.remove('timestamp');
+    prefs.remove('key');
   }
 
-  Future<void> _saveCredentials(String email, String password) async {
+  Future<void> _saveCredentials(
+      String email, String password, String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('email', email);
     prefs.setString('password', password);
     prefs.setInt('timestamp', DateTime.now().millisecondsSinceEpoch);
+    prefs.setString('key', key);
+  }
+
+  Future<String?> _getStoredKey() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('key');
   }
 
   void _resetLoadingState() {

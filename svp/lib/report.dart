@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-void main() {
-  runApp(const ReportDataApp());
-}
 
-class ReportDataApp extends StatelessWidget {
+
+class ReportDataApp extends StatefulWidget {
   const ReportDataApp({super.key});
 
+  @override
+  State<ReportDataApp> createState() => _ReportDataAppState();
+}
+
+class _ReportDataAppState extends State<ReportDataApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

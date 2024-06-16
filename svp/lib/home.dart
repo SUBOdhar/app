@@ -5,6 +5,7 @@ import 'package:svp/Dealer.dart';
 import 'package:svp/add_product.dart';
 import 'package:svp/clear.dart';
 import 'package:svp/main.dart' as MainApp;
+import 'package:svp/notification.dart';
 import 'package:svp/report.dart';
 import 'package:svp/sell.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -49,8 +50,6 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
     super.dispose();
   }
 
-
-
   Future<void> _checkVersion() async {
     try {
       final result = await _versionService.checkVersion();
@@ -88,7 +87,7 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
   void _showUpdateDialog() {
     if (_updateurl == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Update URL is empty')),
+        const SnackBar(content: Text('Update URL is empty')),
       );
       return;
     }
@@ -133,7 +132,7 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Update URL is empty')),
+        const SnackBar(content: Text('Update URL is empty')),
       );
     }
   }
@@ -145,7 +144,8 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
       appBar: AppBar(
         title: const Text(
           'Welcome',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
@@ -183,9 +183,7 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
                 style: const TextStyle(color: Colors.white70),
               ),
             ),
-            _buildDrawerItem(Icons.home, 'Home', () {
-              // Add your navigation logic here
-            }),
+            _buildDrawerItem(Icons.home, 'Home', () {}),
             _buildDrawerItem(Icons.info, 'About', () {
               // Add your navigation logic here
             }),
@@ -268,6 +266,22 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const Report()),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: _buildButtonRow(
+                  context,
+                  [
+                    _buildButtonData(
+                        'Notification', Icons.notifications, Colors.blueGrey,
+                        () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Notify()),
                       );
                     }),
                   ],

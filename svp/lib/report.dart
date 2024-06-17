@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ReportDataApp extends StatefulWidget {
   const ReportDataApp({super.key});
@@ -112,7 +112,10 @@ class _ReportState extends State<Report> {
       String? customerName,
       String? startDate,
       String? endDate}) async {
-    String apiUrl = 'https://api.svp.com.np/daily-report?date=$date';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String key = prefs.getString('key') ?? '';
+
+    String apiUrl = 'https://api.svp.com.np/daily-report?date=$date&key=$key';
 
     if (dealerName != null) {
       apiUrl += '&dealer_name=$dealerName';

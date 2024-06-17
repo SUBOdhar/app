@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Clear extends StatefulWidget {
   const Clear({super.key});
 
@@ -36,21 +38,37 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _clearData(BuildContext context) async {
     const baseUrl = 'https://api.svp.com.np';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String key = prefs.getString('key') ?? '';
+
+    // Add the key to the _selectedData map
+    final requestData = {
+      ..._selectedData,
+      'key': key,
+    };
+
     final clearUrl = Uri.parse('$baseUrl/clear-data');
-    final response = await http.post(
-      clearUrl,
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode(_selectedData),
-    );
-    if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Data cleared successfully.'),
-      ));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Failed to clear data.'),
+    try {
+      final response = await http.post(
+        clearUrl,
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestData),
+      );
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Data cleared successfully.'),
+        ));
+        
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Failed to clear data.'),
+        ));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('An error occurred: $e'),
       ));
     }
   }
@@ -62,7 +80,6 @@ class _HomePageState extends State<HomePage> {
         title: const Text(
           'Clear Data',
         ),
-
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -136,7 +153,8 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(
                             fontSize: 20.0, fontWeight: FontWeight.bold),
                       ),
-                      content: const Text('Are you sure you want to clear data?'),
+                      content:
+                          const Text('Are you sure you want to clear data?'),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context),

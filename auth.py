@@ -133,11 +133,20 @@ def login():
 def add_item():
     data = request.get_json()
     required_fields = ['item', 'quantity', 'batchNo',
-                       'manufactureDate', 'expiryDate', 'dealerName', 'price']
+                       'manufactureDate', 'expiryDate', 'dealerName', 'price', 'key']
     if not all(field in data for field in required_fields):
         missing_fields = [
             field for field in required_fields if field not in data]
         return jsonify({'message': f'Missing fields: {", ".join(missing_fields)}'}), 400
+
+     # Authenticator
+    key = data[key]
+    with sqlite3.connect('login_notification_data.db') as connect:
+        cursor_key = connect.cursor()
+        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        dat = cursor_key.fetchall()
+        if not dat:
+            return jsonify({'message': 'Not Authenticated'}), 401
 
     try:
         with sqlite3.connect('inventory.db') as conn:
@@ -156,6 +165,15 @@ def add_item():
 
 @app.route('/dealers', methods=['GET'])
 def get_dealers():
+    # Authenticator
+    key = request.args.get('key')
+    with sqlite3.connect('login_notification_data.db') as connect:
+        cursor_key = connect.cursor()
+        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        dat = cursor_key.fetchall()
+        if not dat:
+            return jsonify({'message': 'Not Authenticated'}), 401
+
     try:
         with sqlite3.connect('inventory.db') as conn:
             cursor = conn.cursor()
@@ -171,6 +189,16 @@ def get_dealers():
 
 @app.route('/customers', methods=['GET'])
 def get_customers():
+
+    # Authenticator
+    key = request.args.get('key')
+    with sqlite3.connect('login_notification_data.db') as connect:
+        cursor_key = connect.cursor()
+        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        dat = cursor_key.fetchall()
+        if not dat:
+            return jsonify({'message': 'Not Authenticated'}), 401
+
     try:
         with sqlite3.connect('inventory.db') as conn:
             cursor = conn.cursor()
@@ -188,11 +216,20 @@ def get_customers():
 def add_dealer():
     data = request.get_json()
     required_fields = ['name', 'address',
-                       'phoneNo', 'email', 'panno', 'dd_reg']
+                       'phoneNo', 'email', 'panno', 'dd_reg', 'key']
     if not all(field in data for field in required_fields):
         missing_fields = [
             field for field in required_fields if field not in data]
         return jsonify({'message': f'Missing fields: {", ".join(missing_fields)}'}), 400
+
+     # Authenticator
+    key = data['key']
+    with sqlite3.connect('login_notification_data.db') as connect:
+        cursor_key = connect.cursor()
+        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        dat = cursor_key.fetchall()
+        if not dat:
+            return jsonify({'message': 'Not Authenticated'}), 401
 
     try:
         with sqlite3.connect('inventory.db') as conn:
@@ -211,6 +248,14 @@ def add_dealer():
 
 @app.route('/products', methods=['GET'])
 def get_products():
+    # Authenticator
+    key = request.args.get('key')
+    with sqlite3.connect('login_notification_data.db') as connect:
+        cursor_key = connect.cursor()
+        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        dat = cursor_key.fetchall()
+        if not dat:
+            return jsonify({'message': 'Not Authenticated'}), 401
     try:
         with sqlite3.connect('inventory.db') as conn:
             cursor = conn.cursor()
@@ -231,7 +276,7 @@ def get_products():
 def sell_product():
     data = request.get_json()
     required_fields = ['productIds', 'batchNo', 'quantity',
-                       'total_price', 'customerName', 'phoneNo', 'address']
+                       'total_price', 'customerName', 'phoneNo', 'address', 'key']
     if not all(field in data for field in required_fields):
         missing_fields = [
             field for field in required_fields if field not in data]
@@ -241,6 +286,14 @@ def sell_product():
     batch_nos = data['batchNo']
     quantity = data['quantity']
     total_price = data['total_price']
+    # Authenticator
+    key = data['key']
+    with sqlite3.connect('login_notification_data.db') as connect:
+        cursor_key = connect.cursor()
+        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        dat = cursor_key.fetchall()
+        if not dat:
+            return jsonify({'message': 'Not Authenticated'}), 401
 
     if not isinstance(product_ids, list) or not isinstance(batch_nos, list) or len(product_ids) != len(batch_nos):
         return jsonify({'message': 'productIds and batchNo must be lists of the same length'}), 400
@@ -299,12 +352,13 @@ def daily_report():
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
     key = request.args.get('key')
+
     with sqlite3.connect('login_notification_data.db') as connect:
         cursor_key = connect.cursor()
         cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
         dat = cursor_key.fetchall()
         if not dat:
-            return jsonify({'message': 'authenticated'})
+            return jsonify({'message': 'Not Authenticated'}), 401
     try:
         with sqlite3.connect('inventory.db') as conn:
             cursor = conn.cursor()
@@ -387,6 +441,14 @@ def clear_data():
     clear_sales = data.get('clear_sales', False)
     clear_customers = data.get('clear_customers', False)
     clear_dealers = data.get('clear_dealers', False)
+    key = data.get('key')
+
+    with sqlite3.connect('login_notification_data.db') as connect:
+        cursor_key = connect.cursor()
+        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        dat = cursor_key.fetchall()
+        if not dat:
+            return jsonify({'message': 'Not Authenticated'}), 401
 
     try:
         with sqlite3.connect('inventory.db') as conn:
@@ -411,6 +473,14 @@ def clear_data():
 @app.route('/version-manager', methods=['POST'])
 def version():
     data = request.get_json()
+ # List of required fields
+    required_fields = ['version', 'key']
+
+    # Check if all required fields are in the incoming data
+    if not all(field in data for field in required_fields):
+        missing_fields = [
+            field for field in required_fields if field not in data]
+        return jsonify({'message': f'Missing fields: {", ".join(missing_fields)}'}), 400
 
     # reads the url file for the latest url
     with open('url', 'r') as file:
@@ -423,17 +493,15 @@ def version():
     # Latest version
     global_version = f'v{ver}'
     new_version_url = content.strip()
-    # List of required fields
-    required_fields = ['version']
-
-    # Check if all required fields are in the incoming data
-    if not all(field in data for field in required_fields):
-        missing_fields = [
-            field for field in required_fields if field not in data]
-        return jsonify({'message': f'Missing fields: {", ".join(missing_fields)}'}), 400
 
     client_version = data['version']
-
+    key = data['key']
+    with sqlite3.connect('login_notification_data.db') as connect:
+        cursor_key = connect.cursor()
+        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        dat = cursor_key.fetchall()
+        if not dat:
+            return jsonify({'message': 'Not Authenticated'}), 401
     # Check if client version matches the global version
     if client_version != global_version:
         print('update_needed')
@@ -495,6 +563,39 @@ def notice():
         conn3.commit()
 
     return jsonify({'message': 'Authenticated', 'title': title, 'body': body})
+
+
+@app.route('/notices', methods=['POST'])
+def notices():
+    data = request.get_json()
+    # List of required fields
+    required_fields = ['key']
+
+    # Check if all required fields are in the incoming data
+    if not all(field in data for field in required_fields):
+        missing_fields = [
+            field for field in required_fields if field not in data]
+        return jsonify({'message': f'Missing fields: {", ".join(missing_fields)}'}), 400
+
+    key = data['key']
+
+    # Check if the key exists in the database
+    with sqlite3.connect('login_notification_data.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT id FROM login_key WHERE key=?', (key,))
+        dd = cursor.fetchone()
+
+    if not dd:
+        return jsonify({'message': 'Authentication failed'}), 401
+
+    with sqlite3.connect('login_notification_data.db') as conn2:
+        cursor2 = conn2.cursor()
+        cursor2.execute(
+            'SELECT body, title FROM notifications WHERE key=?', (key))
+        dd3 = cursor2.fetchall()
+        notification = [{'message': 'Authentiated',
+                         'title': ntfy[1], 'body': ntfy[0]} for ntfy in dd3]
+    return jsonify(notification), 200
 
 
 if __name__ == '__main__':

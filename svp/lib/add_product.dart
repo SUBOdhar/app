@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -82,7 +84,10 @@ class _AddState extends State<Add> {
   }
 
   Future<void> _fetchDealerNames() async {
-    final url = Uri.parse('$mainUrl/dealers');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String key = prefs.getString('key') ?? '';
+
+    final url = Uri.parse('$mainUrl/dealers?key=$key');
     try {
       final response = await http.get(url);
 
@@ -161,7 +166,8 @@ class _AddState extends State<Add> {
     final String manufactureDate = _manufactureDate!.toIso8601String();
     final String expiryDate = _expiryDate!.toIso8601String();
     final double price = double.parse(_priceController.text);
-
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String key = prefs.getString('key') ?? '';
     final url = Uri.parse('$mainUrl/add-item');
     try {
       final response = await http.post(
@@ -177,6 +183,7 @@ class _AddState extends State<Add> {
           'expiryDate': expiryDate,
           'price': price,
           'dealerName': _selectedDealer,
+          'key': key,
         }),
       );
 

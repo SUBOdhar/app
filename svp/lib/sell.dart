@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Sell extends StatefulWidget {
   const Sell({super.key});
@@ -108,7 +108,10 @@ class _SellProductScreenState extends State<SellProductScreen> {
 
   Future<void> _fetchProducts() async {
     try {
-      final response = await http.get(Uri.parse('$_apiUrl/products'));
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String key = prefs.getString('key') ?? '';
+
+      final response = await http.get(Uri.parse('$_apiUrl/products?key=$key'));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -145,6 +148,8 @@ class _SellProductScreenState extends State<SellProductScreen> {
       if (_selectedProduct != null) {
         List<int> productIds = [_selectedProduct!.id];
         List<String> batchNo = [_selectedProduct!.batchNo];
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String key = prefs.getString('key') ?? '';
 
         final payload = {
           'productIds': productIds,
@@ -154,6 +159,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
           'customerName': _customerNameController.text,
           'phoneNo': _phoneNoController.text,
           'address': _addressController.text,
+          'key': key,
         };
 
         final response = await http.post(

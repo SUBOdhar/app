@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Dealer extends StatefulWidget {
   const Dealer({super.key});
@@ -41,7 +42,8 @@ class _DealerState extends State<Dealer> {
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       final url = Uri.parse('https://api.svp.com.np/add-dealer');
-
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String key = prefs.getString('key') ?? '';
       final response = await http.post(
         url,
         headers: <String, String>{
@@ -54,6 +56,7 @@ class _DealerState extends State<Dealer> {
           'email': _emailController.text,
           'panno': _panController.text,
           'dd_reg': _DDREGController.text,
+          'key': key,
         }),
       );
 
@@ -135,7 +138,7 @@ class _DealerState extends State<Dealer> {
                   focusNode: _namefocus,
                   decoration: const InputDecoration(
                     labelText: 'Name',
-                    prefixIcon:  Icon(Symbols.person),
+                    prefixIcon: Icon(Symbols.person),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -150,7 +153,7 @@ class _DealerState extends State<Dealer> {
                   focusNode: _addressfocus,
                   decoration: const InputDecoration(
                     labelText: 'Address',
-                    prefixIcon:  Icon(Symbols.location_on),
+                    prefixIcon: Icon(Symbols.location_on),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -165,7 +168,7 @@ class _DealerState extends State<Dealer> {
                   focusNode: _phonenofocus,
                   decoration: const InputDecoration(
                     labelText: 'Phone Number',
-                    prefixIcon:  Icon(Symbols.phone),
+                    prefixIcon: Icon(Symbols.phone),
                   ),
                   keyboardType: TextInputType.phone,
                   validator: (value) {
@@ -181,7 +184,7 @@ class _DealerState extends State<Dealer> {
                   focusNode: _emailfocus,
                   decoration: const InputDecoration(
                     labelText: 'Email',
-                    prefixIcon:  Icon(Symbols.email),
+                    prefixIcon: Icon(Symbols.email),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -197,7 +200,7 @@ class _DealerState extends State<Dealer> {
                   focusNode: _pannofocus,
                   decoration: const InputDecoration(
                     labelText: 'Pan no',
-                    prefixIcon:  Icon(Symbols.id_card),
+                    prefixIcon: Icon(Symbols.id_card),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (value) {
@@ -213,7 +216,7 @@ class _DealerState extends State<Dealer> {
                   focusNode: _DDREGfocus,
                   decoration: const InputDecoration(
                     labelText: 'D.D. REG. NO',
-                    prefixIcon:  Icon(Icons.recent_actors_rounded),
+                    prefixIcon: Icon(Icons.recent_actors_rounded),
                   ),
                   keyboardType: TextInputType.text,
                   validator: (value) {

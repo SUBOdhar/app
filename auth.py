@@ -143,7 +143,7 @@ def add_item():
     key = data[key]
     with sqlite3.connect('login_notification_data.db') as connect:
         cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
         dat = cursor_key.fetchall()
         if not dat:
             return jsonify({'message': 'Not Authenticated'}), 401
@@ -169,7 +169,7 @@ def get_dealers():
     key = request.args.get('key')
     with sqlite3.connect('login_notification_data.db') as connect:
         cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
         dat = cursor_key.fetchall()
         if not dat:
             return jsonify({'message': 'Not Authenticated'}), 401
@@ -194,7 +194,7 @@ def get_customers():
     key = request.args.get('key')
     with sqlite3.connect('login_notification_data.db') as connect:
         cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
         dat = cursor_key.fetchall()
         if not dat:
             return jsonify({'message': 'Not Authenticated'}), 401
@@ -226,7 +226,7 @@ def add_dealer():
     key = data['key']
     with sqlite3.connect('login_notification_data.db') as connect:
         cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
         dat = cursor_key.fetchall()
         if not dat:
             return jsonify({'message': 'Not Authenticated'}), 401
@@ -252,7 +252,7 @@ def get_products():
     key = request.args.get('key')
     with sqlite3.connect('login_notification_data.db') as connect:
         cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
         dat = cursor_key.fetchall()
         if not dat:
             return jsonify({'message': 'Not Authenticated'}), 401
@@ -290,7 +290,7 @@ def sell_product():
     key = data['key']
     with sqlite3.connect('login_notification_data.db') as connect:
         cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
         dat = cursor_key.fetchall()
         if not dat:
             return jsonify({'message': 'Not Authenticated'}), 401
@@ -355,7 +355,7 @@ def daily_report():
 
     with sqlite3.connect('login_notification_data.db') as connect:
         cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
         dat = cursor_key.fetchall()
         if not dat:
             return jsonify({'message': 'Not Authenticated'}), 401
@@ -445,7 +445,7 @@ def clear_data():
 
     with sqlite3.connect('login_notification_data.db') as connect:
         cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
+        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
         dat = cursor_key.fetchall()
         if not dat:
             return jsonify({'message': 'Not Authenticated'}), 401
@@ -474,7 +474,7 @@ def clear_data():
 def version():
     data = request.get_json()
  # List of required fields
-    required_fields = ['version', 'key']
+    required_fields = ['version']
 
     # Check if all required fields are in the incoming data
     if not all(field in data for field in required_fields):
@@ -495,13 +495,7 @@ def version():
     new_version_url = content.strip()
 
     client_version = data['version']
-    key = data['key']
-    with sqlite3.connect('login_notification_data.db') as connect:
-        cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_keys WHERE key=?', (key))
-        dat = cursor_key.fetchall()
-        if not dat:
-            return jsonify({'message': 'Not Authenticated'}), 401
+
     # Check if client version matches the global version
     if client_version != global_version:
         print('update_needed')

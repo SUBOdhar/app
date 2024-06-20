@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class VersionService {
-  final String currentVersion = 'v0.0.009'; // Example client version
+  final String currentVersion = 'v0.0.010'; // Example client version
   final String serverUrl =
       'https://api.svp.com.np/version-manager'; // Update with your server details
 

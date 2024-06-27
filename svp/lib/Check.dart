@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Check extends StatefulWidget {
   const Check({super.key});
 
@@ -19,7 +21,10 @@ class _CheckState extends State<Check> {
   }
 
   Future<void> fetchProducts() async {
-    final response = await http.get(Uri.parse('$mainurl/products'));
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String key = prefs.getString('key') ?? '';
+
+    final response = await http.get(Uri.parse('$mainurl/products?key=$key'));
 
     if (response.statusCode == 200) {
       setState(() {

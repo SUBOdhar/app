@@ -26,6 +26,7 @@ class _DealerState extends State<Dealer> {
   final FocusNode _addressfocus = FocusNode();
   final FocusNode _phonenofocus = FocusNode();
   final FocusNode _DDREGfocus = FocusNode();
+  final FocusNode _button = FocusNode();
 
   @override
   void dispose() {
@@ -35,6 +36,7 @@ class _DealerState extends State<Dealer> {
     _addressfocus.dispose();
     _phonenofocus.dispose();
     _DDREGfocus.dispose();
+    _button.dispose();
 
     super.dispose();
   }
@@ -108,16 +110,6 @@ class _DealerState extends State<Dealer> {
 
   @override
   Widget build(BuildContext context) {
-    final inputDecoration = InputDecoration(
-      border: const OutlineInputBorder(),
-      labelStyle: TextStyle(color: Theme.of(context).primaryColor),
-      focusedBorder: OutlineInputBorder(
-        borderSide:
-            BorderSide(color: Theme.of(context).primaryColor, width: 2.0),
-      ),
-      prefixIconColor: Theme.of(context).primaryColor,
-    );
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Add Dealer"),
@@ -146,6 +138,9 @@ class _DealerState extends State<Dealer> {
                     }
                     return null;
                   },
+                  onFieldSubmitted: (value) {
+                    FocusScope.of(context).requestFocus(_addressfocus);
+                  },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -160,6 +155,9 @@ class _DealerState extends State<Dealer> {
                       return 'Please enter the address';
                     }
                     return null;
+                  },
+                  onFieldSubmitted: (value) {
+                    FocusScope.of(context).requestFocus(_phonenofocus);
                   },
                 ),
                 const SizedBox(height: 16),
@@ -177,6 +175,9 @@ class _DealerState extends State<Dealer> {
                     }
                     return null;
                   },
+                  onFieldSubmitted: (value) {
+                    FocusScope.of(context).requestFocus(_emailfocus);
+                  },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -192,6 +193,9 @@ class _DealerState extends State<Dealer> {
                       return 'Please enter the email';
                     }
                     return null;
+                  },
+                  onFieldSubmitted: (value) {
+                    FocusScope.of(context).requestFocus(_pannofocus);
                   },
                 ),
                 const SizedBox(height: 16),
@@ -209,6 +213,9 @@ class _DealerState extends State<Dealer> {
                     }
                     return null;
                   },
+                  onFieldSubmitted: (value) {
+                    FocusScope.of(context).requestFocus(_DDREGfocus);
+                  },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -225,9 +232,13 @@ class _DealerState extends State<Dealer> {
                     }
                     return null;
                   },
+                  onFieldSubmitted: (value) {
+                    FocusScope.of(context).requestFocus(_button);
+                  },
                 ),
                 const SizedBox(height: 32),
                 ElevatedButton(
+                  focusNode: _button,
                   onPressed: () {
                     _submitForm();
                   },

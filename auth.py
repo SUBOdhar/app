@@ -15,6 +15,16 @@ logging.basicConfig(level=logging.DEBUG)
 valid_email = 'aryalsubodh4@gmail.com'
 valid_password = 'subodh4444'
 
+# Function to verify API key
+
+
+def verify_key(key):
+    with sqlite3.connect('login_notification_data.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT 1 FROM login_key WHERE key=?', (key,))
+        return cursor.fetchone() is not None
+
+
 # Function to create SQLite database and tables if they don't exist
 
 
@@ -134,19 +144,16 @@ def add_item():
     data = request.get_json()
     required_fields = ['item', 'quantity', 'batchNo',
                        'manufactureDate', 'expiryDate', 'dealerName', 'price', 'key']
+
     if not all(field in data for field in required_fields):
         missing_fields = [
             field for field in required_fields if field not in data]
         return jsonify({'message': f'Missing fields: {", ".join(missing_fields)}'}), 400
 
-     # Authenticator
-    key = data[key]
-    with sqlite3.connect('login_notification_data.db') as connect:
-        cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
-        dat = cursor_key.fetchall()
-        if not dat:
-            return jsonify({'message': 'Not Authenticated'}), 401
+    # Authenticator
+    key = data['key']
+    if not verify_key(key):
+        return jsonify({'message': 'Not Authenticated'}), 401
 
     try:
         with sqlite3.connect('inventory.db') as conn:
@@ -167,13 +174,8 @@ def add_item():
 def get_dealers():
     # Authenticator
     key = request.args.get('key')
-    with sqlite3.connect('login_notification_data.db') as connect:
-        cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
-        dat = cursor_key.fetchall()
-        if not dat:
-            return jsonify({'message': 'Not Authenticated'}), 401
-
+    if not verify_key(key):
+        return jsonify({'message': 'Not Authenticated'}), 401
     try:
         with sqlite3.connect('inventory.db') as conn:
             cursor = conn.cursor()
@@ -192,13 +194,8 @@ def get_customers():
 
     # Authenticator
     key = request.args.get('key')
-    with sqlite3.connect('login_notification_data.db') as connect:
-        cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
-        dat = cursor_key.fetchall()
-        if not dat:
-            return jsonify({'message': 'Not Authenticated'}), 401
-
+    if not verify_key(key):
+        return jsonify({'message': 'Not Authenticated'}), 401
     try:
         with sqlite3.connect('inventory.db') as conn:
             cursor = conn.cursor()
@@ -224,13 +221,8 @@ def add_dealer():
 
      # Authenticator
     key = data['key']
-    with sqlite3.connect('login_notification_data.db') as connect:
-        cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
-        dat = cursor_key.fetchall()
-        if not dat:
-            return jsonify({'message': 'Not Authenticated'}), 401
-
+    if not verify_key(key):
+        return jsonify({'message': 'Not Authenticated'}), 401
     try:
         with sqlite3.connect('inventory.db') as conn:
             cursor = conn.cursor()
@@ -250,12 +242,10 @@ def add_dealer():
 def get_products():
     # Authenticator
     key = request.args.get('key')
-    with sqlite3.connect('login_notification_data.db') as connect:
-        cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
-        dat = cursor_key.fetchall()
-        if not dat:
-            return jsonify({'message': 'Not Authenticated'}), 401
+    if not verify_key(key):
+        print("Not authenticated")
+        return jsonify({'message': 'Not Authenticated'}), 401
+
     try:
         with sqlite3.connect('inventory.db') as conn:
             cursor = conn.cursor()
@@ -264,9 +254,11 @@ def get_products():
                 FROM items
             ''')
             items = cursor.fetchall()
+
         products = [{'id': item[0], 'name': item[1], 'manufacture_date': item[2], 'expiry_date': item[3],
                      'batch_no': item[4], 'price': item[5], 'quantity': item[6]} for item in items]
         return jsonify(products), 200
+
     except sqlite3.Error as e:
         logging.error(f"SQLite error: {e}")
         return jsonify({'message': 'Failed to fetch products'}), 500
@@ -288,12 +280,8 @@ def sell_product():
     total_price = data['total_price']
     # Authenticator
     key = data['key']
-    with sqlite3.connect('login_notification_data.db') as connect:
-        cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
-        dat = cursor_key.fetchall()
-        if not dat:
-            return jsonify({'message': 'Not Authenticated'}), 401
+    if not verify_key(key):
+        return jsonify({'message': 'Not Authenticated'}), 401
 
     if not isinstance(product_ids, list) or not isinstance(batch_nos, list) or len(product_ids) != len(batch_nos):
         return jsonify({'message': 'productIds and batchNo must be lists of the same length'}), 400
@@ -353,12 +341,8 @@ def daily_report():
     end_date = request.args.get('end_date')
     key = request.args.get('key')
 
-    with sqlite3.connect('login_notification_data.db') as connect:
-        cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
-        dat = cursor_key.fetchall()
-        if not dat:
-            return jsonify({'message': 'Not Authenticated'}), 401
+    if not verify_key(key):
+        return jsonify({'message': 'Not Authenticated'}), 401
     try:
         with sqlite3.connect('inventory.db') as conn:
             cursor = conn.cursor()
@@ -443,13 +427,8 @@ def clear_data():
     clear_dealers = data.get('clear_dealers', False)
     key = data.get('key')
 
-    with sqlite3.connect('login_notification_data.db') as connect:
-        cursor_key = connect.cursor()
-        cursor_key.execute('SELECT key FROM login_key WHERE key=?', (key))
-        dat = cursor_key.fetchall()
-        if not dat:
-            return jsonify({'message': 'Not Authenticated'}), 401
-
+    if not verify_key(key):
+        return jsonify({'message': 'Not Authenticated'}), 401
     try:
         with sqlite3.connect('inventory.db') as conn:
             cursor = conn.cursor()
@@ -525,14 +504,8 @@ def notice():
 
     key = data['key']
 
-    # Check if the key exists in the database
-    with sqlite3.connect('login_notification_data.db') as conn:
-        cursor = conn.cursor()
-        cursor.execute('SELECT id FROM login_key WHERE key=?', (key,))
-        dd = cursor.fetchone()
-
-    if not dd:
-        return jsonify({'message': 'Authentication failed'}), 401
+    if not verify_key(key):
+        return jsonify({'message': 'Not Authenticated'}), 401
 
     status = 0
 
@@ -573,14 +546,8 @@ def notices():
 
     key = data['key']
 
-    # Check if the key exists in the database
-    with sqlite3.connect('login_notification_data.db') as conn:
-        cursor = conn.cursor()
-        cursor.execute('SELECT id FROM login_key WHERE key=?', (key,))
-        dd = cursor.fetchone()
-
-    if not dd:
-        return jsonify({'message': 'Authentication failed'}), 401
+    if not verify_key(key):
+        return jsonify({'message': 'Not Authenticated'}), 401
 
     with sqlite3.connect('login_notification_data.db') as conn2:
         cursor2 = conn2.cursor()

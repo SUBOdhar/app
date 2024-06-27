@@ -79,6 +79,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
   final FocusNode _addressFocus = FocusNode();
   final FocusNode _customerNameFocus = FocusNode();
   final FocusNode _phoneNoFocus = FocusNode();
+  final FocusNode _button = FocusNode();
 
   List<Product> _products = [];
   Product? _selectedProduct;
@@ -102,6 +103,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
     _addressFocus.dispose();
     _customerNameFocus.dispose();
     _phoneNoFocus.dispose();
+    _button.dispose();
 
     super.dispose();
   }
@@ -289,6 +291,10 @@ class _SellProductScreenState extends State<SellProductScreen> {
                           }
                           return null;
                         },
+                        onFieldSubmitted: (value) {
+                          FocusScope.of(context)
+                              .requestFocus(_customerNameFocus);
+                        },
                       ),
                       const SizedBox(height: 16.0),
                       TextFormField(
@@ -303,6 +309,9 @@ class _SellProductScreenState extends State<SellProductScreen> {
                             return 'Please enter customer name';
                           }
                           return null;
+                        },
+                        onFieldSubmitted: (value) {
+                          FocusScope.of(context).requestFocus(_phoneNoFocus);
                         },
                       ),
                       const SizedBox(height: 16.0),
@@ -319,6 +328,9 @@ class _SellProductScreenState extends State<SellProductScreen> {
                           }
                           return null;
                         },
+                        onFieldSubmitted: (value) {
+                          FocusScope.of(context).requestFocus(_addressFocus);
+                        },
                       ),
                       const SizedBox(height: 16.0),
                       TextFormField(
@@ -334,6 +346,9 @@ class _SellProductScreenState extends State<SellProductScreen> {
                           }
                           return null;
                         },
+                        onFieldSubmitted: (value) {
+                          FocusScope.of(context).requestFocus(_button);
+                        },
                       ),
                       const SizedBox(height: 16.0),
                       ListTile(
@@ -346,6 +361,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
                       const SizedBox(height: 20.0),
                       ElevatedButton(
                         onPressed: _sellProduct,
+                        focusNode: _button,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16.0),
                           shape: RoundedRectangleBorder(

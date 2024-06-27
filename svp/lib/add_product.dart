@@ -52,6 +52,7 @@ class _AddState extends State<Add> {
   final FocusNode _quantityfocus = FocusNode();
   final FocusNode _batchnofocus = FocusNode();
   final FocusNode _pricefocus = FocusNode();
+  final FocusNode _button = FocusNode();
 
   DateTime? _manufactureDate;
   DateTime? _expiryDate;
@@ -79,6 +80,7 @@ class _AddState extends State<Add> {
     _pricefocus.dispose();
     _batchnofocus.dispose();
     _pricefocus.dispose();
+    _button.dispose();
 
     super.dispose();
   }
@@ -263,6 +265,9 @@ class _AddState extends State<Add> {
                     }
                     return null;
                   },
+                  onFieldSubmitted: (value) {
+                    FocusScope.of(context).requestFocus(_quantityfocus);
+                  },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -282,6 +287,9 @@ class _AddState extends State<Add> {
                     }
                     return null;
                   },
+                  onFieldSubmitted: (value) {
+                    FocusScope.of(context).requestFocus(_batchnofocus);
+                  },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -296,6 +304,9 @@ class _AddState extends State<Add> {
                       return 'Please enter the batch number';
                     }
                     return null;
+                  },
+                  onFieldSubmitted: (value) {
+                    FocusScope.of(context).requestFocus(_pricefocus);
                   },
                 ),
                 const SizedBox(height: 16),
@@ -315,6 +326,9 @@ class _AddState extends State<Add> {
                       return 'Please enter a valid price';
                     }
                     return null;
+                  },
+                  onFieldSubmitted: (value) {
+                    FocusScope.of(context).requestFocus(_button);
                   },
                 ),
                 const SizedBox(height: 16),
@@ -360,6 +374,7 @@ class _AddState extends State<Add> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
+                  focusNode: _button,
                   onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,

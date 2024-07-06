@@ -4,25 +4,6 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ReportDataApp extends StatefulWidget {
-  const ReportDataApp({super.key});
-
-  @override
-  State<ReportDataApp> createState() => _ReportDataAppState();
-}
-
-class _ReportDataAppState extends State<ReportDataApp> {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Product Report App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const Report(),
-    );
-  }
-}
 
 class ProductTransaction {
   final String item;
@@ -81,8 +62,11 @@ class _ReportState extends State<Report> {
   }
 
   Future<void> fetchDealersAndCustomers() async {
-    await fetchOptions('/dealers', _dealers);
-    await fetchOptions('/customers', _customers);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String key = prefs.getString('key') ?? '';
+
+    await fetchOptions('/dealers?key=$key', _dealers);
+    await fetchOptions('/customers?key=$key', _customers);
   }
 
   Future<void> fetchOptions(String endpoint, List<String> targetList) async {
@@ -222,6 +206,10 @@ class _ReportState extends State<Report> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Daily Report"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
           IconButton(
             icon: Icon(_showFilters ? Icons.close : Icons.filter_list),

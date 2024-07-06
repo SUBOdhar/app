@@ -1,38 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:svp/Check.dart';
-import 'package:svp/Dealer.dart';
-import 'package:svp/add_product.dart';
-import 'package:svp/clear.dart';
-import 'package:svp/main.dart' as MainApp;
-import 'package:svp/notification.dart';
-import 'package:svp/report.dart';
-import 'package:svp/sell.dart';
+import 'package:svp/pages/check.dart';
+import 'package:svp/pages/dealer.dart';
+import 'package:svp/pages/add_product.dart';
+import 'package:svp/pages/clear.dart';
+import 'package:svp/pages/login.dart' as mail_app;
+import 'package:svp/pages/report.dart';
+import 'package:svp/pages/sell.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:svp/version.dart';
+import 'package:svp/pages/version/version.dart';
+import 'package:svp/pages/chicken.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   final String username;
   const Home({required this.username, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Page(username: username),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
-class Page extends StatefulWidget {
-  final String username;
-  const Page({required this.username, super.key});
 
   @override
   _PageState createState() => _PageState();
 }
 
-class _PageState extends State<Page> with WidgetsBindingObserver {
+class _PageState extends State<Home> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final VersionService _versionService = VersionService();
   String _serverVersion = '';
@@ -194,7 +182,7 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
               prefs.remove('timestamp');
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const MainApp.Login()),
+                MaterialPageRoute(builder: (context) => const mail_app.Login()),
               );
             }),
           ],
@@ -210,15 +198,15 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
                 child: _buildButtonRow(
                   context,
                   [
-                    _buildButtonData('Sell', Icons.sell, Colors.blue, () {
+                    _buildButtonData(
+                        'Sell', FontAwesomeIcons.cartShopping, Colors.blue, () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const Sell()),
                       );
                     }),
                     _buildButtonData(
-                        'Clear data', Icons.cleaning_services, Colors.green,
-                        () {
+                        'Clear data', FontAwesomeIcons.broom, Colors.green, () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const Clear()),
@@ -233,14 +221,16 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
                   context,
                   [
                     _buildButtonData(
-                        'Add Product', Icons.add_circle, Colors.orange, () {
+                        'Add Product', FontAwesomeIcons.plus, Colors.orange,
+                        () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const Add()),
                       );
                     }),
                     _buildButtonData(
-                        'Add Dealer', Icons.person_add, Colors.purple, () {
+                        'Add Dealer', FontAwesomeIcons.userPlus, Colors.purple,
+                        () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const Dealer()),
@@ -254,15 +244,15 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
                 child: _buildButtonRow(
                   context,
                   [
-                    _buildButtonData(
-                        'Check Stock', Icons.inventory, Colors.teal, () {
+                    _buildButtonData('Check Stock',
+                        FontAwesomeIcons.windowMaximize, Colors.teal, () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const Check()),
                       );
                     }),
-                    _buildButtonData('Report', Icons.description, Colors.red,
-                        () {
+                    _buildButtonData(
+                        'Report', FontAwesomeIcons.fileLines, Colors.red, () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const Report()),
@@ -276,12 +266,12 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
                 child: _buildButtonRow(
                   context,
                   [
-                    _buildButtonData(
-                        'Notification', Icons.notifications, Colors.blueGrey,
-                        () {
+                    _buildButtonData('Chicken', FontAwesomeIcons.dove,
+                        Colors.yellow.shade800, () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Notify()),
+                        MaterialPageRoute(
+                            builder: (context) => const Chicken()),
                       );
                     }),
                   ],
@@ -333,7 +323,7 @@ class _PageState extends State<Page> with WidgetsBindingObserver {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        icon: Icon(icon, size: 24),
+        icon: FaIcon(icon, size: 24),
         label: Text(text),
       ),
     );

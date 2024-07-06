@@ -1,39 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
-
-class Sell extends StatefulWidget {
-  const Sell({super.key});
-
-  @override
-  State<Sell> createState() => _SellState();
-}
-
-class _SellState extends State<Sell> {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Sell Product App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        inputDecorationTheme: const InputDecorationTheme(
-          border: OutlineInputBorder(),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.blueAccent),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.blue, width: 2.0),
-          ),
-          labelStyle: TextStyle(color: Colors.blueAccent),
-        ),
-      ),
-      home: const SellProductScreen(),
-    );
-  }
-}
 
 class Product {
   final int id;
@@ -60,14 +28,14 @@ class Product {
   }
 }
 
-class SellProductScreen extends StatefulWidget {
-  const SellProductScreen({super.key});
+class Sell extends StatefulWidget {
+  const Sell({super.key});
 
   @override
   _SellProductScreenState createState() => _SellProductScreenState();
 }
 
-class _SellProductScreenState extends State<SellProductScreen> {
+class _SellProductScreenState extends State<Sell> {
   final _formKey = GlobalKey<FormState>();
   final _quantityController = TextEditingController();
   final _customerNameController = TextEditingController();
@@ -236,6 +204,10 @@ class _SellProductScreenState extends State<SellProductScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sell Product'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -267,6 +239,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
                                 labelText: 'Product',
                                 hintText: 'Select product',
                                 prefixIcon: Icon(Icons.medication_outlined),
+                                border: UnderlineInputBorder(),
                               ),
                               validator: (value) {
                                 if (_selectedProduct == null) {
@@ -283,6 +256,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
                         decoration: const InputDecoration(
                           labelText: 'Quantity',
                           prefixIcon: Icon(Icons.shopping_cart),
+                          border: UnderlineInputBorder(),
                         ),
                         keyboardType: TextInputType.number,
                         validator: (value) {
@@ -301,6 +275,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
                         decoration: const InputDecoration(
                           labelText: 'Customer Name',
                           prefixIcon: Icon(Icons.person),
+                          border: UnderlineInputBorder(),
                         ),
                         controller: _customerNameController,
                         focusNode: _customerNameFocus,
@@ -319,6 +294,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
                         decoration: const InputDecoration(
                           labelText: 'Phone No.',
                           prefixIcon: Icon(Icons.phone),
+                          border: UnderlineInputBorder(),
                         ),
                         controller: _phoneNoController,
                         focusNode: _phoneNoFocus,
@@ -337,6 +313,7 @@ class _SellProductScreenState extends State<SellProductScreen> {
                         decoration: const InputDecoration(
                           labelText: 'Address',
                           prefixIcon: Icon(Icons.location_on),
+                          border: UnderlineInputBorder(),
                         ),
                         controller: _addressController,
                         focusNode: _addressFocus,

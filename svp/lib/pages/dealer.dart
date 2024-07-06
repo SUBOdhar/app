@@ -18,14 +18,14 @@ class _DealerState extends State<Dealer> {
   final TextEditingController _phoneNoController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _panController = TextEditingController();
-  final TextEditingController _DDREGController = TextEditingController();
+  final TextEditingController _ddregontroller = TextEditingController();
 
   final FocusNode _namefocus = FocusNode();
   final FocusNode _emailfocus = FocusNode();
   final FocusNode _pannofocus = FocusNode();
   final FocusNode _addressfocus = FocusNode();
   final FocusNode _phonenofocus = FocusNode();
-  final FocusNode _DDREGfocus = FocusNode();
+  final FocusNode _ddregfocus = FocusNode();
   final FocusNode _button = FocusNode();
 
   @override
@@ -35,7 +35,7 @@ class _DealerState extends State<Dealer> {
     _pannofocus.dispose();
     _addressfocus.dispose();
     _phonenofocus.dispose();
-    _DDREGfocus.dispose();
+    _ddregfocus.dispose();
     _button.dispose();
 
     super.dispose();
@@ -57,7 +57,7 @@ class _DealerState extends State<Dealer> {
           'phoneNo': _phoneNoController.text,
           'email': _emailController.text,
           'panno': _panController.text,
-          'dd_reg': _DDREGController.text,
+          'dd_reg': _ddregontroller.text,
           'key': key,
         }),
       );
@@ -75,7 +75,7 @@ class _DealerState extends State<Dealer> {
         _phoneNoController.clear();
         _emailController.clear();
         _panController.clear();
-        _DDREGController.clear();
+        _ddregontroller.clear();
       } else {
         iconData = Icons.error;
         title = 'Error';
@@ -113,6 +113,10 @@ class _DealerState extends State<Dealer> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Add Dealer"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -131,6 +135,7 @@ class _DealerState extends State<Dealer> {
                   decoration: const InputDecoration(
                     labelText: 'Name',
                     prefixIcon: Icon(Symbols.person),
+                    border: UnderlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -149,6 +154,7 @@ class _DealerState extends State<Dealer> {
                   decoration: const InputDecoration(
                     labelText: 'Address',
                     prefixIcon: Icon(Symbols.location_on),
+                    border: UnderlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -167,6 +173,7 @@ class _DealerState extends State<Dealer> {
                   decoration: const InputDecoration(
                     labelText: 'Phone Number',
                     prefixIcon: Icon(Symbols.phone),
+                    border: UnderlineInputBorder(),
                   ),
                   keyboardType: TextInputType.phone,
                   validator: (value) {
@@ -186,6 +193,7 @@ class _DealerState extends State<Dealer> {
                   decoration: const InputDecoration(
                     labelText: 'Email',
                     prefixIcon: Icon(Symbols.email),
+                    border: UnderlineInputBorder(),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -205,6 +213,7 @@ class _DealerState extends State<Dealer> {
                   decoration: const InputDecoration(
                     labelText: 'Pan no',
                     prefixIcon: Icon(Symbols.id_card),
+                    border: UnderlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (value) {
@@ -214,16 +223,17 @@ class _DealerState extends State<Dealer> {
                     return null;
                   },
                   onFieldSubmitted: (value) {
-                    FocusScope.of(context).requestFocus(_DDREGfocus);
+                    FocusScope.of(context).requestFocus(_ddregfocus);
                   },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
-                  controller: _DDREGController,
-                  focusNode: _DDREGfocus,
+                  controller: _ddregontroller,
+                  focusNode: _ddregfocus,
                   decoration: const InputDecoration(
                     labelText: 'D.D. REG. NO',
                     prefixIcon: Icon(Icons.recent_actors_rounded),
+                    border: UnderlineInputBorder(),
                   ),
                   keyboardType: TextInputType.text,
                   validator: (value) {

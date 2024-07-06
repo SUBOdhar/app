@@ -472,6 +472,7 @@ def version():
     # Latest version
     global_version = f'v{ver}'
     new_version_url = content.strip()
+    new_version_url = new_version_url+'/app-release.apk'
 
     client_version = data['version']
 

@@ -4,36 +4,6 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Inventory Management',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        inputDecorationTheme: const InputDecorationTheme(
-          border: OutlineInputBorder(),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.blueAccent),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.blue, width: 2.0),
-          ),
-          labelStyle: TextStyle(color: Colors.blueAccent),
-        ),
-      ),
-      home: const Add(),
-    );
-  }
-}
-
 class Add extends StatefulWidget {
   const Add({super.key});
 
@@ -60,6 +30,8 @@ class _AddState extends State<Add> {
   List<String> _dealerNames = [];
 
   String? _resultMessage;
+
+  // ignore: unused_field
   IconData? _resultIcon;
 
   final mainUrl = "https://api.svp.com.np";
@@ -109,7 +81,6 @@ class _AddState extends State<Add> {
       _showErrorDialog('Failed to fetch dealer names');
     }
   }
-
   void _showErrorDialog(String message) {
     showDialog<void>(
       context: context,
@@ -243,6 +214,10 @@ class _AddState extends State<Add> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Add Items"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -258,6 +233,7 @@ class _AddState extends State<Add> {
                   decoration: const InputDecoration(
                     labelText: 'Item',
                     prefixIcon: Icon(Icons.shopping_bag),
+                    border: UnderlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -276,6 +252,7 @@ class _AddState extends State<Add> {
                   decoration: const InputDecoration(
                     labelText: 'Quantity',
                     prefixIcon: Icon(Icons.format_list_numbered),
+                    border: UnderlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (value) {
@@ -298,6 +275,7 @@ class _AddState extends State<Add> {
                   decoration: const InputDecoration(
                     labelText: 'Batch No',
                     prefixIcon: Icon(Icons.confirmation_number),
+                    border: UnderlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -316,6 +294,7 @@ class _AddState extends State<Add> {
                   decoration: const InputDecoration(
                     labelText: 'Price',
                     prefixIcon: Icon(Icons.attach_money),
+                    border: UnderlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
                   validator: (value) {

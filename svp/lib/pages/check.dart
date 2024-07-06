@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Check extends StatefulWidget {
@@ -40,6 +39,10 @@ class _CheckState extends State<Check> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Check Products"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: products.isEmpty
           ? const Center(child: CircularProgressIndicator())

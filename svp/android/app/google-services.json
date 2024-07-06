@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "160520030772",
+    "project_id": "svp-1-4b31d",
+    "storage_bucket": "svp-1-4b31d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:160520030772:android:427a9fa1f50d1d37321861",
+        "android_client_info": {
+          "package_name": "com.example.svp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBI-Zs5tIh4aCqOm1GB3xK3Tren-vNEow0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

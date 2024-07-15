@@ -43,11 +43,10 @@ class _SellProductScreenState extends State<Sell> {
   final _addressController = TextEditingController();
   final _apiUrl = 'https://api.svp.com.np';
 
-  final FocusNode _quantityFocus = FocusNode();
-  final FocusNode _addressFocus = FocusNode();
-  final FocusNode _customerNameFocus = FocusNode();
-  final FocusNode _phoneNoFocus = FocusNode();
-  final FocusNode _button = FocusNode();
+  late FocusNode _quantityFocus;
+  late FocusNode _addressFocus;
+  late FocusNode _customerNameFocus;
+  late FocusNode _phoneNoFocus;
 
   List<Product> _products = [];
   Product? _selectedProduct;
@@ -59,6 +58,10 @@ class _SellProductScreenState extends State<Sell> {
     super.initState();
     _fetchProducts();
     _quantityController.addListener(_updateEstimatedPrice);
+    _customerNameFocus = FocusNode();
+    _addressFocus = FocusNode();
+    _phoneNoFocus = FocusNode();
+    _quantityFocus = FocusNode();
   }
 
   @override
@@ -67,11 +70,11 @@ class _SellProductScreenState extends State<Sell> {
     _customerNameController.dispose();
     _phoneNoController.dispose();
     _addressController.dispose();
+
     _quantityFocus.dispose();
     _addressFocus.dispose();
     _customerNameFocus.dispose();
     _phoneNoFocus.dispose();
-    _button.dispose();
 
     super.dispose();
   }
@@ -323,9 +326,6 @@ class _SellProductScreenState extends State<Sell> {
                           }
                           return null;
                         },
-                        onFieldSubmitted: (value) {
-                          FocusScope.of(context).requestFocus(_button);
-                        },
                       ),
                       const SizedBox(height: 16.0),
                       ListTile(
@@ -338,7 +338,6 @@ class _SellProductScreenState extends State<Sell> {
                       const SizedBox(height: 20.0),
                       ElevatedButton(
                         onPressed: _sellProduct,
-                        focusNode: _button,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16.0),
                           shape: RoundedRectangleBorder(

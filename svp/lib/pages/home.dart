@@ -136,15 +136,6 @@ class _PageState extends State<Home> with WidgetsBindingObserver {
               fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: Colors.transparent,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blue, Colors.purple],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
       ),
       drawer: Drawer(
         child: ListView(
@@ -286,7 +277,7 @@ class _PageState extends State<Home> with WidgetsBindingObserver {
 
   ListTile _buildDrawerItem(IconData icon, String title, VoidCallback onTap) {
     return ListTile(
-      leading: Icon(icon, color: Colors.black),
+      leading: Icon(icon),
       title: Text(title),
       onTap: onTap,
     );

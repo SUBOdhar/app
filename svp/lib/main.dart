@@ -42,8 +42,8 @@ class MyApp extends StatelessWidget {
 void _showNotification(RemoteMessage message) async {
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
-    'your_channel_id', // Change this to your channel ID
-    'your_channel_name', // Change this to your channel name
+    '01', // Change this to your channel ID
+    'svp', // Change this to your channel name
     sound: RawResourceAndroidNotificationSound('custom_sound'),
     importance: Importance.max,
     priority: Priority.high,

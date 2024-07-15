@@ -20,23 +20,39 @@ class _DealerState extends State<Dealer> {
   final TextEditingController _panController = TextEditingController();
   final TextEditingController _ddregontroller = TextEditingController();
 
-  final FocusNode _namefocus = FocusNode();
-  final FocusNode _emailfocus = FocusNode();
-  final FocusNode _pannofocus = FocusNode();
-  final FocusNode _addressfocus = FocusNode();
-  final FocusNode _phonenofocus = FocusNode();
-  final FocusNode _ddregfocus = FocusNode();
-  final FocusNode _button = FocusNode();
+  late FocusNode _namefocus;
+  late FocusNode _emailfocus;
+  late FocusNode _pannofocus;
+  late FocusNode _addressfocus;
+  late FocusNode _phonenofocus;
+  late FocusNode _ddregfocus;
+
+  @override
+  void initState() {
+    super.initState();
+    _namefocus = FocusNode();
+    _emailfocus = FocusNode();
+    _pannofocus = FocusNode();
+    _addressfocus = FocusNode();
+    _phonenofocus = FocusNode();
+    _ddregfocus = FocusNode();
+  }
 
   @override
   void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _panController.dispose();
+    _addressController.dispose();
+    _phoneNoController.dispose();
+    _ddregfocus.dispose();
+
     _namefocus.dispose();
     _emailfocus.dispose();
     _pannofocus.dispose();
     _addressfocus.dispose();
     _phonenofocus.dispose();
     _ddregfocus.dispose();
-    _button.dispose();
 
     super.dispose();
   }
@@ -134,7 +150,9 @@ class _DealerState extends State<Dealer> {
                   focusNode: _namefocus,
                   decoration: const InputDecoration(
                     labelText: 'Name',
-                    prefixIcon: Icon(Symbols.person),
+                    prefixIcon: Icon(
+                      Symbols.person,
+                    ),
                     border: UnderlineInputBorder(),
                   ),
                   validator: (value) {
@@ -153,7 +171,9 @@ class _DealerState extends State<Dealer> {
                   focusNode: _addressfocus,
                   decoration: const InputDecoration(
                     labelText: 'Address',
-                    prefixIcon: Icon(Symbols.location_on),
+                    prefixIcon: Icon(
+                      Symbols.location_on,
+                    ),
                     border: UnderlineInputBorder(),
                   ),
                   validator: (value) {
@@ -242,19 +262,14 @@ class _DealerState extends State<Dealer> {
                     }
                     return null;
                   },
-                  onFieldSubmitted: (value) {
-                    FocusScope.of(context).requestFocus(_button);
-                  },
                 ),
                 const SizedBox(height: 32),
                 ElevatedButton(
-                  focusNode: _button,
                   onPressed: () {
                     _submitForm();
                   },
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Theme.of(context).primaryColor,
+                    backgroundColor: Colors.purple,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 30, vertical: 15),
                     textStyle: const TextStyle(fontSize: 16),
@@ -262,7 +277,10 @@ class _DealerState extends State<Dealer> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text('Add Dealer'),
+                  child: const Text(
+                    'Add Dealer',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             ),
@@ -271,14 +289,4 @@ class _DealerState extends State<Dealer> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: const Dealer(),
-    theme: ThemeData(
-      primaryColor: Colors.purple,
-      visualDensity: VisualDensity.adaptivePlatformDensity,
-    ),
-  ));
 }

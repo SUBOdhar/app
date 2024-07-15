@@ -111,7 +111,7 @@ class _ClearState extends State<Clear> {
                   ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor:
-                          WidgetStateProperty.all<Color>(Colors.blue),
+                          WidgetStateProperty.all<Color>(Colors.green),
                       foregroundColor:
                           WidgetStateProperty.all<Color>(Colors.white),
                       textStyle: WidgetStateProperty.all<TextStyle>(

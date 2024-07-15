@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Add extends StatefulWidget {
@@ -18,11 +17,10 @@ class _AddState extends State<Add> {
   final TextEditingController _batchNoController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
 
-  final FocusNode _itemfocus = FocusNode();
-  final FocusNode _quantityfocus = FocusNode();
-  final FocusNode _batchnofocus = FocusNode();
-  final FocusNode _pricefocus = FocusNode();
-  final FocusNode _button = FocusNode();
+  late FocusNode _itemfocus;
+  late FocusNode _quantityfocus;
+  late FocusNode _batchnofocus;
+  late FocusNode _pricefocus;
 
   DateTime? _manufactureDate;
   DateTime? _expiryDate;
@@ -40,6 +38,10 @@ class _AddState extends State<Add> {
   void initState() {
     super.initState();
     _fetchDealerNames();
+    _itemfocus = FocusNode();
+    _quantityfocus = FocusNode();
+    _batchnofocus = FocusNode();
+    _pricefocus = FocusNode();
   }
 
   @override
@@ -48,11 +50,11 @@ class _AddState extends State<Add> {
     _quantityController.dispose();
     _batchNoController.dispose();
     _priceController.dispose();
+    
     _itemfocus.dispose();
     _pricefocus.dispose();
+    _quantityfocus.dispose();
     _batchnofocus.dispose();
-    _pricefocus.dispose();
-    _button.dispose();
 
     super.dispose();
   }
@@ -81,17 +83,27 @@ class _AddState extends State<Add> {
       _showErrorDialog('Failed to fetch dealer names');
     }
   }
+
   void _showErrorDialog(String message) {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Error'),
-          content: Text(message),
+          title: const Text(
+            'Error',
+            style: TextStyle(color: Colors.black),
+          ),
+          content: Text(
+            message,
+            style: const TextStyle(color: Colors.black),
+          ),
           actions: <Widget>[
             TextButton(
-              child: const Text('OK'),
+              child: const Text(
+                'OK',
+                style: TextStyle(color: Colors.black),
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -306,9 +318,6 @@ class _AddState extends State<Add> {
                     }
                     return null;
                   },
-                  onFieldSubmitted: (value) {
-                    FocusScope.of(context).requestFocus(_button);
-                  },
                 ),
                 const SizedBox(height: 16),
                 ListTile(
@@ -353,11 +362,10 @@ class _AddState extends State<Add> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  focusNode: _button,
                   onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Colors.orange,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),

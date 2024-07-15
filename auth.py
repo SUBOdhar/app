@@ -12,8 +12,8 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 # Hardcoded valid credentials for the login endpoint
-valid_email = 'aryalsubodh4@gmail.com'
-valid_password = 'subodh4444'
+valid_email = 'skbd@skbd.com'
+valid_password = 'skbd0001'
 
 # Function to verify API key
 

@@ -106,16 +106,25 @@ class _DealerState extends State<Dealer> {
               children: [
                 Icon(iconData),
                 const SizedBox(width: 10),
-                Text(title),
+                Text(
+                  title,
+                  style: TextStyle(color: Colors.black),
+                ),
               ],
             ),
-            content: Text(message),
+            content: Text(
+              message,
+              style: TextStyle(color: Colors.black),
+            ),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text('OK'),
+                child: const Text(
+                  'OK',
+                  style: TextStyle(color: Colors.black),
+                ),
               ),
             ],
           );

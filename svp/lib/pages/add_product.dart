@@ -50,7 +50,7 @@ class _AddState extends State<Add> {
     _quantityController.dispose();
     _batchNoController.dispose();
     _priceController.dispose();
-    
+
     _itemfocus.dispose();
     _pricefocus.dispose();
     _quantityfocus.dispose();
@@ -205,11 +205,20 @@ class _AddState extends State<Add> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Success'),
-          content: Text(message),
+          title: const Text(
+            'Success',
+            style: TextStyle(color: Colors.black),
+          ),
+          content: Text(
+            message,
+            style: TextStyle(color: Colors.black),
+          ),
           actions: <Widget>[
             TextButton(
-              child: const Text('OK'),
+              child: const Text(
+                'OK',
+                style: TextStyle(color: Colors.black),
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },

@@ -45,6 +45,19 @@ def create_database_and_tables():
             )
         ''')
         cursor.execute('''
+            CREATE TABLE IF NOT EXISTS items_data (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                item TEXT,
+                quantity INTEGER,
+                batch_no TEXT,
+                manufacture_date TEXT,
+                expiry_date TEXT,
+                dealer_name TEXT,
+                price INTEGER,
+                added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        cursor.execute('''
             CREATE TABLE IF NOT EXISTS dealers (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT,
@@ -160,6 +173,10 @@ def add_item():
             cursor = conn.cursor()
             cursor.execute('''
                 INSERT INTO items (item, quantity, batch_no, manufacture_date, expiry_date, dealer_name, price)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (data['item'], data['quantity'], data['batchNo'], data['manufactureDate'], data['expiryDate'], data['dealerName'], data['price']))
+            cursor.execute('''
+                INSERT INTO items_data (item, quantity, batch_no, manufacture_date, expiry_date, dealer_name, price)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             ''', (data['item'], data['quantity'], data['batchNo'], data['manufactureDate'], data['expiryDate'], data['dealerName'], data['price']))
             conn.commit()
@@ -343,6 +360,7 @@ def daily_report():
 
     if not verify_key(key):
         return jsonify({'message': 'Not Authenticated'}), 401
+
     try:
         with sqlite3.connect('inventory.db') as conn:
             cursor = conn.cursor()
@@ -365,10 +383,10 @@ def daily_report():
             query += '''
                 UNION ALL
 
-                SELECT 'Sold' AS type, i.item, s.quantity, i.batch_no, i.manufacture_date AS date, NULL AS dealer_name, s.sale_date, c.name as customer_name, s.total_price
+                SELECT 'Sold' AS type, i.item, s.quantity, i.batch_no, i.manufacture_date AS date, NULL AS dealer_name, s.sale_date AS added_date, c.name as customer_name, s.total_price
                 FROM sales s
                 JOIN items i ON s.product_id = i.id
-                JOIN customers c ON s.customer_id = c.id
+                LEFT JOIN customers c ON s.customer_id = c.id
                 WHERE date(s.sale_date) = ?
             '''
             params.append(report_date)

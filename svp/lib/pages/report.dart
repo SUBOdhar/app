@@ -4,7 +4,6 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class ProductTransaction {
   final String item;
   final int quantity;
@@ -12,11 +11,13 @@ class ProductTransaction {
   final double? totalPrice;
   final String? dealerName;
   final String? customerName;
+  final String? batchno;
 
   ProductTransaction({
     required this.item,
     required this.quantity,
     required this.date,
+    required this.batchno,
     this.totalPrice,
     this.dealerName,
     this.customerName,
@@ -27,9 +28,11 @@ class ProductTransaction {
       item: json['item'],
       quantity: json['quantity'],
       date: json['date'] ?? '',
-      totalPrice: json['totalPrice']?.toDouble(),
-      dealerName: json['dealerName'],
-      customerName: json['customerName'],
+      batchno: json['batch_no'],
+      totalPrice:
+          json['total_price']?.toDouble(), // adjust based on API response key
+      dealerName: json['dealer_name'],
+      customerName: json['customer_name'],
     );
   }
 }
@@ -70,13 +73,21 @@ class _ReportState extends State<Report> {
   }
 
   Future<void> fetchOptions(String endpoint, List<String> targetList) async {
-    final response =
-        await http.get(Uri.parse('https://api.svp.com.np$endpoint'));
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-      targetList.addAll(data.cast<String>());
-    } else {
-      throw Exception('Failed to fetch $endpoint');
+    try {
+      final response =
+          await http.get(Uri.parse('https://api.svp.com.np$endpoint'));
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        setState(() {
+          targetList.addAll(data.cast<String>());
+        });
+      } else {
+        throw Exception('Failed to fetch $endpoint');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching options: $e')),
+      );
     }
   }
 
@@ -114,25 +125,29 @@ class _ReportState extends State<Report> {
       apiUrl += '&end_date=$endDate';
     }
 
-    final response = await http.get(Uri.parse(apiUrl));
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = json.decode(response.body);
 
-    if (response.statusCode == 200) {
-      Map<String, dynamic> data = json.decode(response.body);
+        List<ProductTransaction> addedProducts =
+            (data['added_products'] as List)
+                .map((item) => ProductTransaction.fromJson(item))
+                .toList();
 
-      List<ProductTransaction> addedProducts = (data['added_products'] as List)
-          .map((item) => ProductTransaction.fromJson(item))
-          .toList();
+        List<ProductTransaction> soldProducts = (data['sold_products'] as List)
+            .map((item) => ProductTransaction.fromJson(item))
+            .toList();
 
-      List<ProductTransaction> soldProducts = (data['sold_products'] as List)
-          .map((item) => ProductTransaction.fromJson(item))
-          .toList();
-
-      return {
-        'added': addedProducts,
-        'sold': soldProducts,
-      };
-    } else {
-      throw Exception('Failed to load daily report');
+        return {
+          'added': addedProducts,
+          'sold': soldProducts,
+        };
+      } else {
+        throw Exception('Failed to load daily report');
+      }
+    } catch (e) {
+      throw Exception('Failed to load daily report: $e');
     }
   }
 
@@ -253,7 +268,7 @@ class _ReportState extends State<Report> {
                         onPressed: () => _selectDate(context, true),
                         child: Text(_startDate == null
                             ? 'Select Start Date'
-                            : 'Start Date                            Date: $_startDate'),
+                            : 'Start Date: $_startDate'),
                       ),
                       ElevatedButton(
                         onPressed: () => _selectDate(context, false),
@@ -311,7 +326,7 @@ class _ReportState extends State<Report> {
                       ),
                       ...soldProducts.map((product) => _buildProductCard(
                           product.item,
-                          'Quantity: ${product.quantity}\nSold Date: ${product.date}\nCustomer: ${product.customerName}\nTotal Price: ${product.totalPrice}',
+                          'Batch no: ${product.batchno}\nQuantity: ${product.quantity}\nSold Date: ${product.date}\nCustomer: ${product.customerName}\nTotal Price: ${product.totalPrice}',
                           context)),
                     ],
                   );

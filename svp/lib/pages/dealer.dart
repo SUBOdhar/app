@@ -45,7 +45,6 @@ class _DealerState extends State<Dealer> {
     _panController.dispose();
     _addressController.dispose();
     _phoneNoController.dispose();
-    _ddregfocus.dispose();
 
     _namefocus.dispose();
     _emailfocus.dispose();
@@ -108,13 +107,11 @@ class _DealerState extends State<Dealer> {
                 const SizedBox(width: 10),
                 Text(
                   title,
-                  style: TextStyle(color: Colors.black),
                 ),
               ],
             ),
             content: Text(
               message,
-              style: TextStyle(color: Colors.black),
             ),
             actions: [
               TextButton(
@@ -123,7 +120,6 @@ class _DealerState extends State<Dealer> {
                 },
                 child: const Text(
                   'OK',
-                  style: TextStyle(color: Colors.black),
                 ),
               ),
             ],

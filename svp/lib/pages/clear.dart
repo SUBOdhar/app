@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Clear extends StatefulWidget {
@@ -12,6 +12,8 @@ class Clear extends StatefulWidget {
 }
 
 class _ClearState extends State<Clear> {
+  final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
+      GlobalKey<ScaffoldMessengerState>();
   final Map<String, bool> _selectedData = {
     'clear_items': false,
     'clear_sales': false,
@@ -20,15 +22,25 @@ class _ClearState extends State<Clear> {
   };
 
   bool _isLoading = false;
+  late SharedPreferences _prefs;
 
-  Future<void> _clearData(BuildContext context) async {
+  @override
+  void initState() {
+    super.initState();
+    _initSharedPreferences();
+  }
+
+  Future<void> _initSharedPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+  }
+
+  Future<void> _clearData() async {
     setState(() {
       _isLoading = true;
     });
 
-    const baseUrl = 'https://api.svp.com.np';
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String key = prefs.getString('key') ?? '';
+    final baseUrl = 'https://api.svp.com.np';
+    final String key = _prefs.getString('key') ?? '';
 
     final requestData = {
       ..._selectedData,
@@ -44,38 +56,40 @@ class _ClearState extends State<Clear> {
         },
         body: jsonEncode(requestData),
       );
+
       setState(() {
         _isLoading = false;
       });
+
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Data cleared successfully.'),
-          backgroundColor: Colors.green,
-        ));
+        _showSnackBar('Data cleared successfully', Colors.green);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Failed to clear data.'),
-          backgroundColor: Colors.red,
-        ));
+        _showSnackBar('Failed to clear data', Colors.red);
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('An error occurred: $e'),
-        backgroundColor: Colors.red,
-      ));
+      _showSnackBar('An error occurred: $e', Colors.red);
     }
   }
 
-  Widget _buildCheckbox(String title, String key) {
+  void _showSnackBar(String message, Color color) {
+    _scaffoldKey.currentState?.showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: color,
+      ),
+    );
+  }
+
+  Widget _buildCheckbox(String title, String dataKey) {
     return CheckboxListTile(
       title: Text(title),
-      value: _selectedData[key],
+      value: _selectedData[dataKey],
       onChanged: (bool? value) {
         setState(() {
-          _selectedData[key] = value!;
+          _selectedData[dataKey] = value!;
         });
       },
     );
@@ -84,12 +98,9 @@ class _ClearState extends State<Clear> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: const Text('Clear Data'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -109,23 +120,6 @@ class _ClearState extends State<Clear> {
                   _buildCheckbox('Dealers', 'clear_dealers'),
                   const SizedBox(height: 20.0),
                   ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor:
-                          WidgetStateProperty.all<Color>(Colors.green),
-                      foregroundColor:
-                          WidgetStateProperty.all<Color>(Colors.white),
-                      textStyle: WidgetStateProperty.all<TextStyle>(
-                        const TextStyle(fontSize: 16),
-                      ),
-                      padding: WidgetStateProperty.all<EdgeInsets>(
-                        const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      shape: WidgetStateProperty.all<OutlinedBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
                     onPressed: () {
                       showDialog(
                         context: context,
@@ -146,7 +140,7 @@ class _ClearState extends State<Clear> {
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
-                                  _clearData(context);
+                                  _clearData();
                                 },
                                 child: const Text('Clear'),
                               ),
@@ -155,6 +149,14 @@ class _ClearState extends State<Clear> {
                         },
                       );
                     },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                    ),
                     child: const Text('Clear Data'),
                   ),
                 ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:svp/pages/about.dart';
 import 'package:svp/pages/check.dart';
 import 'package:svp/pages/dealer.dart';
 import 'package:svp/pages/add_product.dart';
@@ -85,23 +86,33 @@ class _PageState extends State<Home> with WidgetsBindingObserver {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Update Available'),
+          title: const Text(
+            'Update Available',
+            style: const TextStyle(color: Colors.black),
+          ),
           content: Text(
             'A new version ($_serverVersion) is available. Please update to continue.',
+            style: const TextStyle(color: Colors.black),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: const Text(
+                'Cancel',
+                style: const TextStyle(color: Colors.black),
+              ),
             ),
             TextButton(
               onPressed: () {
                 _launchURL();
                 Navigator.of(context).pop();
               },
-              child: const Text('Update'),
+              child: const Text(
+                'Update',
+                style: const TextStyle(color: Colors.black),
+              ),
             ),
           ],
         );
@@ -115,7 +126,10 @@ class _PageState extends State<Home> with WidgetsBindingObserver {
         await launchUrl(_updateurl!);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not launch $_updateurl')),
+          SnackBar(
+              content: Text(
+            'Could not launch $_updateurl',
+          )),
         );
       }
     } else {
@@ -132,8 +146,7 @@ class _PageState extends State<Home> with WidgetsBindingObserver {
       appBar: AppBar(
         title: const Text(
           'Welcome',
-          style: TextStyle(
-              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
       ),
@@ -164,7 +177,10 @@ class _PageState extends State<Home> with WidgetsBindingObserver {
             ),
             _buildDrawerItem(Icons.home, 'Home', () {}),
             _buildDrawerItem(Icons.info, 'About', () {
-              // Add your navigation logic here
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AboutPage()),
+              );
             }),
             _buildDrawerItem(Icons.logout, 'Logout', () async {
               SharedPreferences prefs = await SharedPreferences.getInstance();

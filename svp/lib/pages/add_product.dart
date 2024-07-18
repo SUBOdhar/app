@@ -334,7 +334,7 @@ class _AddState extends State<Add> {
                     _selectedDealer ?? 'Select Dealer',
                     style: TextStyle(
                       color:
-                          _selectedDealer == null ? Colors.grey : Colors.black,
+                          _selectedDealer == null ? Colors.grey : Colors.green,
                     ),
                   ),
                   onTap: () {
@@ -350,7 +350,7 @@ class _AddState extends State<Add> {
                         : 'Manufacture Date: ${_manufactureDate!.toLocal().toString().split(' ')[0]}',
                     style: TextStyle(
                       color:
-                          _manufactureDate == null ? Colors.grey : Colors.black,
+                          _manufactureDate == null ? Colors.grey : Colors.green,
                     ),
                   ),
                   onTap: () => _selectDate(context, true),
@@ -363,7 +363,7 @@ class _AddState extends State<Add> {
                         ? 'Select Expiry Date'
                         : 'Expiry Date: ${_expiryDate!.toLocal().toString().split(' ')[0]}',
                     style: TextStyle(
-                      color: _expiryDate == null ? Colors.grey : Colors.black,
+                      color: _expiryDate == null ? Colors.grey : Colors.green,
                     ),
                   ),
                   onTap: () => _selectDate(context, false),

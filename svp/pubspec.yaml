@@ -3,7 +3,7 @@ description: "A new Flutter project."
 
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 0.0.017
+version: 0.0.020
 
 environment:
   sdk: ">=3.2.3 <4.0.0"
@@ -21,6 +21,7 @@ dependencies:
   firebase_core: ^3.1.1
   firebase_messaging: ^15.0.2
   font_awesome_flutter: ^10.7.0
+  package_info: ^2.0.2
 
 dev_dependencies:
   flutter_test:

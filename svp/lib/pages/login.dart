@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -45,7 +46,6 @@ class _HomePageState extends State<HomePage> {
     _emailController.dispose();
     _passwordController.dispose();
     _passwordFocusNode.dispose();
-    
     super.dispose();
   }
 
@@ -226,32 +226,35 @@ class _HomePageState extends State<HomePage> {
     String password = _passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      await _useStoredCredentials();
-      if (email.isEmpty || password.isEmpty) {
-        _showSnackBar('Please enter both email and password.');
+      int useStoredCredentialsResult = await _useStoredCredentials();
+      if (useStoredCredentialsResult == 1) {
+        _showSnackBar('Please enter both email and password.', Colors.red);
         _resetLoadingState();
         return;
       }
     }
 
-    final success = await _performLogin(email, password);
-    if (success != null && success) {
-      final String? key = await _getStoredKey();
-      if (key != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => Home(username: email)),
-        );
+    if (email.isNotEmpty && password.isNotEmpty) {
+      final success = await _performLogin(email, password);
+      if (success != null && success) {
+        final String? key = await _getStoredKey();
+        if (key != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Logged(email: email)),
+          );
+        } else {
+          _showSnackBar('Login failed. Please try again.', Colors.red);
+        }
       } else {
-        _showSnackBar('Login failed. Please try again.');
+        _showSnackBar('Login failed. Please try again.', Colors.red);
       }
-    } else {
-      _showSnackBar('Login failed. Please try again.');
     }
+
     _resetLoadingState();
   }
 
-  Future<void> _useStoredCredentials() async {
+  Future<int> _useStoredCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String storedEmail = prefs.getString('email') ?? '';
     String storedPassword = prefs.getString('password') ?? '';
@@ -263,18 +266,17 @@ class _HomePageState extends State<HomePage> {
       DateTime now = DateTime.now();
       final difference = now.difference(storedDateTime).inDays;
       if (difference <= 13) {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => Home(username: storedEmail)),
+          MaterialPageRoute(builder: (context) => Logged(email: storedEmail)),
         );
-        setState(() {
-          _loading = false;
-          _buttonColor = const Color.fromRGBO(143, 148, 251, 1);
-        });
+        _resetLoadingState();
+        return 0;
       } else {
         await _clearStoredCredentials();
       }
     }
+    return 1;
   }
 
   Future<bool?> _performLogin(String email, String password) async {
@@ -304,7 +306,7 @@ class _HomePageState extends State<HomePage> {
         return true;
       } else if (response.statusCode == 401) {
         await _clearStoredCredentials();
-        _showSnackBar('Invalid credentials. Please try again.');
+        _showSnackBar('Invalid credentials. Please try again.', Colors.red);
         print('Error: 401 Unauthorized');
         return false;
       } else {
@@ -313,7 +315,7 @@ class _HomePageState extends State<HomePage> {
       }
     } catch (error) {
       print('Error: $error');
-      _showSnackBar('An error occurred. Please try again later.');
+      _showSnackBar('An error occurred. Please try again later.', Colors.red);
       return false;
     }
   }
@@ -347,10 +349,63 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _showSnackBar(String message) {
+  void _showSnackBar(String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(message),
-      backgroundColor: Colors.red,
+      backgroundColor: color,
     ));
+  }
+}
+
+class Logged extends StatefulWidget {
+  final String email;
+  const Logged({required this.email, super.key});
+
+  @override
+  State<Logged> createState() => _LoggedState();
+}
+
+class _LoggedState extends State<Logged> {
+  @override
+  void initState() {
+    super.initState();
+    _navigateToHome();
+  }
+
+  void _navigateToHome() {
+    Future.delayed(const Duration(seconds: 1), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Home(username: widget.email),
+        ),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.check_circle,
+              color: Colors.green,
+              size: 100,
+            ),
+            SizedBox(height: 20),
+            Text(
+              'You have successfully logged in!',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
